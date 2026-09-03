@@ -1,6 +1,7 @@
 {
   "version": 2,
   "rewrites": [
-    { "source": "/(.*)", "destination": "/app.py" }
+    { "source": "/api/(.*)", "destination": "/api/index.py?path=$1" },
+    { "source": "/(.*)", "destination": "/public/$1" }
   ]
 }
