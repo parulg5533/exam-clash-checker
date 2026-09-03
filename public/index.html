@@ -929,6 +929,10 @@
 
             try {
                 const data = await fetch(`/api/course/${courseCode}`).then(r => r.json());
+                if (!data || data.error) {
+                    console.warn("Course data notice:", data?.error);
+                    return;
+                }
                 document.getElementById('courseDetailsPanel').style.display = 'block';
                 document.getElementById('slotSimulatorPanel').style.display = 'block';
 
