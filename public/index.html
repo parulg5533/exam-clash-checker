@@ -556,6 +556,272 @@
             from { transform: translateY(20px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
+
+        /* =========================================================
+           MOBILE & TABLET RESPONSIVE STYLES (Clean Academic UI)
+           ========================================================= */
+
+        /* Responsive Container Utility Classes */
+        .reassigner-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1.5fr auto;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+
+        .draft-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.85rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .draft-actions-group {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        /* Tablet Breakpoint (max-width: 992px) */
+        @media (max-width: 992px) {
+            .inspector-layout {
+                grid-template-columns: 1fr;
+                gap: 1.25rem;
+            }
+
+            .timetable-grid {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
+
+            .reassigner-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .reassigner-grid > div:last-child {
+                grid-column: 1 / -1;
+            }
+
+            .reassigner-grid button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Mobile Breakpoint (max-width: 768px) */
+        @media (max-width: 768px) {
+            header {
+                padding: 0.75rem 1rem;
+            }
+
+            .header-container {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.75rem;
+            }
+
+            .logo-group {
+                gap: 0.75rem;
+            }
+
+            .logo-badge {
+                width: 38px;
+                height: 38px;
+                font-size: 1rem;
+                border-radius: 10px;
+                flex-shrink: 0;
+            }
+
+            .header-titles h1 {
+                font-size: 1.1rem;
+                line-height: 1.3;
+            }
+
+            .header-titles p {
+                font-size: 0.72rem;
+            }
+
+            .header-actions {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 0.45rem;
+                width: 100%;
+            }
+
+            .header-actions #liveSheetBadge {
+                grid-column: 1 / -1;
+                justify-content: center;
+                font-size: 0.75rem;
+                padding: 0.35rem 0.6rem;
+            }
+
+            .header-actions .btn {
+                font-size: 0.75rem;
+                padding: 0.45rem 0.6rem;
+                justify-content: center;
+                white-space: nowrap;
+            }
+
+            .stats-bar {
+                margin: 0.85rem auto 0;
+                padding: 0 1rem;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.65rem;
+            }
+
+            .stat-card {
+                padding: 0.85rem 1rem;
+                border-radius: 12px;
+            }
+
+            .stat-label {
+                font-size: 0.68rem;
+            }
+
+            .stat-value {
+                font-size: 1.45rem;
+                margin-top: 0.25rem;
+            }
+
+            .stat-badge {
+                font-size: 0.65rem;
+                padding: 0.15rem 0.45rem;
+            }
+
+            main {
+                margin: 1rem auto 2rem;
+                padding: 0 1rem;
+            }
+
+            .nav-tabs {
+                gap: 0.35rem;
+                padding-bottom: 0.5rem;
+                margin-bottom: 1.25rem;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+
+            .nav-tabs::-webkit-scrollbar {
+                display: none;
+            }
+
+            .tab-btn {
+                font-size: 0.82rem;
+                padding: 0.5rem 0.85rem;
+                flex-shrink: 0;
+                border-radius: 8px;
+            }
+
+            .card {
+                padding: 1.1rem;
+                border-radius: 14px;
+                margin-bottom: 1rem;
+            }
+
+            .card-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.75rem;
+                margin-bottom: 1rem;
+            }
+
+            .card-title {
+                font-size: 1.05rem;
+            }
+
+            .search-box {
+                max-width: 100%;
+                width: 100%;
+            }
+
+            .search-input {
+                font-size: 0.85rem;
+                padding: 0.65rem 0.85rem 0.65rem 2.3rem;
+            }
+
+            .timetable-grid {
+                grid-template-columns: 1fr;
+                gap: 0.85rem;
+            }
+
+            .slot-card {
+                padding: 1rem;
+                border-radius: 12px;
+            }
+
+            .slot-title {
+                font-size: 0.88rem;
+            }
+
+            .slot-header {
+                padding-bottom: 0.5rem;
+                margin-bottom: 0.65rem;
+            }
+
+            .code-pill {
+                font-size: 0.75rem;
+                padding: 0.18rem 0.45rem;
+            }
+
+            .draft-actions-group {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .draft-actions-group .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .draft-metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.6rem;
+            }
+
+            .reassigner-grid {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+
+            .reassigner-grid button {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .table-responsive {
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .table-responsive table {
+                min-width: 580px;
+            }
+
+            .toast {
+                left: 12px;
+                right: 12px;
+                bottom: 12px;
+                max-width: calc(100vw - 24px);
+                font-size: 0.8rem;
+                padding: 10px 14px;
+            }
+        }
+
+        /* Ultra-Small Mobile (max-width: 420px) */
+        @media (max-width: 420px) {
+            .stats-bar {
+                grid-template-columns: 1fr 1fr;
+                gap: 0.5rem;
+            }
+
+            .stat-value {
+                font-size: 1.25rem;
+            }
+
+            .header-actions {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -767,7 +1033,7 @@
                             Freely reassign courses across slots to eliminate clashes and optimize student load. All changes and headcounts are tracked in real-time.
                         </p>
                     </div>
-                    <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+                    <div class="draft-actions-group">
                         <button class="btn btn-secondary" onclick="undoLastDraftMove()" id="btnUndoDraft" style="font-size: 0.82rem;" title="Undo previous move">
                             <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 10h10a5 5 0 015 5v2M3 10l6-6M3 10l6 6"></path></svg>
                             Undo Move
@@ -784,7 +1050,7 @@
                 </div>
 
                 <!-- Draft Metrics Row -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.85rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                <div class="draft-metrics-grid">
                     <div style="background: #f8fafc; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid var(--border-subtle);">
                         <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Draft Clashes</div>
                         <div id="draftClashCountDisplay" style="font-size: 1.4rem; font-weight: 800; color: #34d399; margin-top: 0.2rem;">0 Clashes</div>
@@ -809,7 +1075,7 @@
                 <div class="card-title" style="margin-bottom: 1rem; font-size: 1.05rem;">
                     <span>⚡ Reassign Any Course to Another Slot</span>
                 </div>
-                <div style="display: grid; grid-template-columns: 1.2fr 1.5fr auto; gap: 1rem; align-items: flex-end;">
+                <div class="reassigner-grid">
                     <div>
                         <label style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">1. Select Course:</label>
                         <select id="draftCourseSelect" class="select-styled" onchange="onDraftCourseSelected()" style="margin-top: 0.35rem;">
