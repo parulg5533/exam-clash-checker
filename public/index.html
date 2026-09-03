@@ -6,57 +6,79 @@
     <title>IIT Patna - Exam Clash Checker & Timetable Auditor</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+        <style>
         :root {
-            --bg-primary: #0a0f1d;
-            --bg-secondary: #111827;
-            --bg-card: rgba(17, 24, 39, 0.75);
-            --bg-card-hover: rgba(31, 41, 55, 0.85);
-            --border-color: rgba(255, 255, 255, 0.08);
-            --border-highlight: rgba(99, 102, 241, 0.4);
+            /* Official IIT Patna Academic Theme (inspired by https://acc.iitp.ac.in/) */
+            --bg-canvas: #f8fafc;
+            --bg-surface: #ffffff;
+            --bg-surface-subtle: #f1f5f9;
+            --bg-card: #ffffff;
             
-            --text-primary: #f9fafb;
-            --text-secondary: #9ca3af;
-            --text-muted: #6b7280;
-            
-            --accent-primary: #6366f1;
-            --accent-primary-hover: #4f46e5;
-            --accent-cyan: #06b6d4;
-            --accent-emerald: #10b981;
-            --accent-rose: #f43f5e;
-            --accent-amber: #f59e0b;
-            --accent-violet: #8b5cf6;
-            
-            --gradient-primary: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
-            --glass-blur: blur(16px);
-            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --border-subtle: #e2e8f0;
+            --border-strong: #cbd5e1;
+            --border-highlight: #93c5fd;
+
+            /* Brand Navy & Royal Blue */
+            --iitp-navy: #0B1E3F;
+            --iitp-navy-dark: #071329;
+            --iitp-navy-light: #162c54;
+            --iitp-blue: #1d4ed8;
+            --iitp-blue-accent: #2563eb;
+            --iitp-blue-light: #eff6ff;
+
+            /* Typography */
+            --text-primary: #0f172a;       /* Deep Slate */
+            --text-secondary: #475569;     /* Mid Slate */
+            --text-muted: #64748b;         /* Light Slate */
+            --text-on-navy: #ffffff;
+
+            /* Accents */
+            --accent-primary: #1d4ed8;
+            --accent-primary-hover: #1e40af;
+            --accent-secondary: #2563eb;
+            --accent-emerald: #059669;
+            --accent-emerald-light: #ecfdf5;
+            --accent-rose: #dc2626;
+            --accent-rose-light: #fef2f2;
+            --accent-amber: #d97706;
+            --accent-amber-light: #fffbeb;
+            --accent-sky: #0284c7;
+            --accent-sky-light: #f0f9ff;
+            --accent-purple: #7c3aed;
+            --accent-purple-light: #faf5ff;
+
+            --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+            --shadow-hover: 0 10px 25px -5px rgba(37, 99, 235, 0.1);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-primary);
+            font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-canvas);
             color: var(--text-primary);
             min-height: 100vh;
             line-height: 1.5;
             overflow-x: hidden;
             background-image: 
-                radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.12) 0%, transparent 40%),
-                radial-gradient(circle at 85% 20%, rgba(236, 72, 153, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 50% 80%, rgba(6, 182, 212, 0.08) 0%, transparent 50%);
+                radial-gradient(circle at 10% 8%, rgba(37, 99, 235, 0.035) 0%, transparent 40%),
+                radial-gradient(circle at 90% 12%, rgba(29, 78, 216, 0.03) 0%, transparent 40%),
+                radial-gradient(circle at 50% 90%, rgba(2, 132, 199, 0.025) 0%, transparent 50%);
             background-attachment: fixed;
         }
 
         header {
-            border-bottom: 1px solid var(--border-color);
-            background: rgba(10, 15, 29, 0.85);
-            backdrop-filter: var(--glass-blur);
+            background: var(--iitp-navy);
+            border-bottom: 3px solid var(--iitp-blue-accent);
+            box-shadow: 0 4px 20px rgba(11, 30, 63, 0.15);
             position: sticky;
             top: 0;
             z-index: 50;
-            padding: 1rem 2rem;
+            padding: 0.9rem 2rem;
         }
 
         .header-container {
@@ -73,28 +95,31 @@
         .logo-badge {
             width: 44px;
             height: 44px;
-            background: var(--gradient-primary);
+            background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+            border: 1px solid rgba(255, 255, 255, 0.25);
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 800;
-            font-size: 1.25rem;
-            color: #fff;
-            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+            font-weight: 900;
+            font-size: 1.15rem;
+            letter-spacing: -0.03em;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
         }
 
         .header-titles h1 {
-            font-size: 1.35rem;
-            font-weight: 700;
+            font-size: 1.3rem;
+            font-weight: 800;
             letter-spacing: -0.02em;
-            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #ffffff;
         }
 
-        .header-titles p { font-size: 0.8rem; color: var(--text-secondary); }
+        .header-titles p {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
 
         .header-actions { display: flex; align-items: center; gap: 0.75rem; }
 
@@ -103,7 +128,7 @@
             align-items: center;
             gap: 0.5rem;
             padding: 0.55rem 1.1rem;
-            border-radius: 10px;
+            border-radius: 9px;
             font-size: 0.85rem;
             font-weight: 600;
             cursor: pointer;
@@ -113,23 +138,39 @@
         }
 
         .btn-primary {
-            background: var(--accent-primary);
-            color: white;
-            box-shadow: 0 2px 10px rgba(99, 102, 241, 0.35);
+            background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+            color: #ffffff;
+            box-shadow: 0 2px 6px rgba(29, 78, 216, 0.3);
         }
 
         .btn-primary:hover {
-            background: var(--accent-primary-hover);
+            background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%);
+            box-shadow: 0 4px 12px rgba(29, 78, 216, 0.4);
             transform: translateY(-1px);
         }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-primary);
-            border-color: var(--border-color);
+            background: #ffffff;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-strong);
         }
 
-        .btn-secondary:hover { background: rgba(255, 255, 255, 0.1); }
+        .btn-secondary:hover {
+            background: #f8fafc;
+            color: var(--text-primary);
+            border-color: #94a3b8;
+        }
+
+        .header-actions .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header-actions .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.16);
+            border-color: rgba(255, 255, 255, 0.35);
+        }
 
         .stats-bar {
             max-width: 1400px;
@@ -141,18 +182,19 @@
         }
 
         .stat-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
+            background: #ffffff;
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
             padding: 1.25rem 1.5rem;
-            backdrop-filter: var(--glass-blur);
             position: relative;
             overflow: hidden;
-            transition: transform 0.2s, border-color 0.2s;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
         }
 
         .stat-card:hover {
-            border-color: var(--border-highlight);
+            border-color: var(--border-strong);
+            box-shadow: var(--shadow-md);
             transform: translateY(-2px);
         }
 
@@ -160,17 +202,17 @@
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; height: 3px;
-            background: var(--accent-primary);
+            background: var(--iitp-blue);
         }
 
         .stat-card.alert::before { background: var(--accent-rose); }
         .stat-card.warning::before { background: var(--accent-amber); }
-        .stat-card.cyan::before { background: var(--accent-cyan); }
+        .stat-card.cyan::before { background: var(--accent-sky); }
 
         .stat-label {
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: var(--text-secondary);
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
@@ -179,7 +221,7 @@
             font-size: 1.85rem;
             font-weight: 800;
             margin-top: 0.4rem;
-            color: #ffffff;
+            color: var(--text-primary);
             display: flex;
             align-items: baseline;
             gap: 0.5rem;
@@ -187,21 +229,21 @@
 
         .stat-badge {
             font-size: 0.75rem;
-            padding: 0.2rem 0.5rem;
+            padding: 0.22rem 0.6rem;
             border-radius: 20px;
             font-weight: 600;
         }
 
         .badge-danger {
-            background: rgba(244, 63, 94, 0.2);
-            color: #fb7185;
-            border: 1px solid rgba(244, 63, 94, 0.4);
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
             animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
             0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            50% { opacity: 0.65; }
         }
 
         main {
@@ -213,7 +255,7 @@
         .nav-tabs {
             display: flex;
             gap: 0.5rem;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 2px solid var(--border-subtle);
             padding-bottom: 0.75rem;
             margin-bottom: 2rem;
             overflow-x: auto;
@@ -221,9 +263,9 @@
 
         .tab-btn {
             background: transparent;
-            border: none;
+            border: 1px solid transparent;
             color: var(--text-secondary);
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             font-weight: 600;
             padding: 0.65rem 1.25rem;
             border-radius: 10px;
@@ -237,23 +279,23 @@
 
         .tab-btn:hover {
             color: var(--text-primary);
-            background: rgba(255, 255, 255, 0.04);
+            background: #f1f5f9;
         }
 
         .tab-btn.active {
-            color: #fff;
-            background: var(--accent-primary);
-            box-shadow: 0 2px 10px rgba(99, 102, 241, 0.35);
+            color: #ffffff;
+            background: var(--iitp-blue);
+            box-shadow: 0 4px 12px rgba(29, 78, 216, 0.25);
+            border-color: var(--iitp-blue);
         }
 
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
         .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 18px;
-            backdrop-filter: var(--glass-blur);
+            background: #ffffff;
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
             padding: 1.75rem;
             margin-bottom: 1.5rem;
             box-shadow: var(--shadow-sm);
@@ -269,9 +311,9 @@
         }
 
         .card-title {
-            font-size: 1.2rem;
+            font-size: 1.15rem;
             font-weight: 700;
-            color: #fff;
+            color: var(--text-primary);
             display: flex;
             align-items: center;
             gap: 0.6rem;
@@ -281,19 +323,19 @@
 
         .search-input {
             width: 100%;
-            background: rgba(17, 24, 39, 0.9);
-            border: 1px solid var(--border-color);
+            background: #ffffff;
+            border: 1px solid var(--border-strong);
             padding: 0.75rem 1rem 0.75rem 2.6rem;
-            border-radius: 12px;
-            color: #fff;
+            border-radius: 11px;
+            color: var(--text-primary);
             font-size: 0.9rem;
             outline: none;
             transition: all 0.2s;
         }
 
         .search-input:focus {
-            border-color: var(--accent-primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+            border-color: var(--iitp-blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
         }
 
         .search-icon {
@@ -309,17 +351,18 @@
             width: 100%;
             overflow-x: auto;
             border-radius: 12px;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border-subtle);
+            background: #ffffff;
         }
 
         table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
 
         th {
-            background: rgba(255, 255, 255, 0.03);
+            background: #f8fafc;
             color: var(--text-secondary);
             padding: 0.85rem 1rem;
-            font-weight: 600;
-            border-bottom: 1px solid var(--border-color);
+            font-weight: 700;
+            border-bottom: 1px solid var(--border-subtle);
             text-transform: uppercase;
             font-size: 0.75rem;
             letter-spacing: 0.05em;
@@ -327,38 +370,46 @@
 
         td {
             padding: 0.85rem 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            border-bottom: 1px solid #f1f5f9;
             color: var(--text-primary);
         }
 
         tr:last-child td { border-bottom: none; }
-        tr:hover td { background: rgba(255, 255, 255, 0.02); }
+        tr:hover td { background: #f8fafc; }
 
         .code-pill {
             display: inline-block;
             font-family: 'JetBrains Mono', monospace;
-            background: rgba(99, 102, 241, 0.15);
-            color: #a5b4fc;
-            padding: 0.2rem 0.5rem;
+            background: #eff6ff;
+            color: #1d4ed8;
+            padding: 0.22rem 0.55rem;
             border-radius: 6px;
             font-size: 0.8rem;
             font-weight: 600;
-            border: 1px solid rgba(99, 102, 241, 0.3);
+            border: 1px solid #bfdbfe;
             cursor: pointer;
             transition: all 0.15s;
         }
 
         .code-pill:hover {
-            background: var(--accent-primary);
-            color: #fff;
+            background: var(--iitp-blue);
+            color: #ffffff;
+            border-color: var(--iitp-blue);
             transform: scale(1.03);
         }
 
         .code-pill.clash {
-            background: rgba(244, 63, 94, 0.2);
-            color: #fda4af;
-            border-color: rgba(244, 63, 94, 0.5);
+            background: #fef2f2;
+            color: #dc2626;
+            border-color: #fecaca;
             animation: pulse 2.5s infinite;
+        }
+
+        .code-pill.moved {
+            background: #ecfdf5;
+            color: #059669;
+            border-color: #a7f3d0;
+            font-weight: 700;
         }
 
         .timetable-grid {
@@ -368,52 +419,59 @@
         }
 
         .slot-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
+            background: #ffffff;
+            border: 1px solid var(--border-subtle);
             border-radius: 14px;
             padding: 1.25rem;
+            box-shadow: var(--shadow-sm);
             transition: all 0.2s ease;
         }
 
         .slot-card:hover {
             border-color: var(--border-highlight);
+            box-shadow: var(--shadow-md);
             transform: translateY(-2px);
         }
 
         .slot-card.has-clash {
-            border-color: rgba(244, 63, 94, 0.6);
-            background: linear-gradient(180deg, rgba(244, 63, 94, 0.08) 0%, rgba(17, 24, 39, 0.7) 100%);
+            border-color: #fca5a5;
+            background: #fff5f5;
+        }
+
+        .slot-card.has-moved {
+            border-color: #86efac;
+            background: #f0fdf4;
         }
 
         .slot-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-subtle);
             padding-bottom: 0.65rem;
             margin-bottom: 0.85rem;
         }
 
-        .slot-title { font-size: 0.95rem; font-weight: 700; color: #fff; }
+        .slot-title { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
 
         .slot-badge {
             font-size: 0.72rem;
-            font-weight: 600;
+            font-weight: 700;
             padding: 0.2rem 0.55rem;
             border-radius: 20px;
             text-transform: uppercase;
         }
 
         .badge-morning {
-            background: rgba(6, 182, 212, 0.15);
-            color: #67e8f9;
-            border: 1px solid rgba(6, 182, 212, 0.3);
+            background: #e0f2fe;
+            color: #0369a1;
+            border: 1px solid #bae6fd;
         }
 
         .badge-evening {
-            background: rgba(168, 85, 247, 0.15);
-            color: #d8b4fe;
-            border: 1px solid rgba(168, 85, 247, 0.3);
+            background: #f3e8ff;
+            color: #7e22ce;
+            border: 1px solid #e9d5ff;
         }
 
         .course-tag-cloud { display: flex; flex-wrap: wrap; gap: 0.45rem; }
@@ -430,17 +488,20 @@
 
         .select-styled {
             width: 100%;
-            background: rgba(17, 24, 39, 0.9);
-            border: 1px solid var(--border-color);
+            background: #ffffff;
+            border: 1px solid var(--border-strong);
             padding: 0.75rem 1rem;
-            border-radius: 12px;
-            color: #fff;
+            border-radius: 11px;
+            color: var(--text-primary);
             font-size: 0.9rem;
             outline: none;
             cursor: pointer;
         }
 
-        .select-styled:focus { border-color: var(--accent-primary); }
+        .select-styled:focus {
+            border-color: var(--iitp-blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
 
         .clash-box {
             border-radius: 12px;
@@ -449,48 +510,39 @@
         }
 
         .clash-box.danger {
-            background: rgba(244, 63, 94, 0.1);
-            border: 1px solid rgba(244, 63, 94, 0.35);
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
         }
 
         .clash-box.success {
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.35);
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
         }
 
         .student-chip {
             display: inline-block;
-            background: rgba(255, 255, 255, 0.08);
+            background: #f1f5f9;
+            color: #334155;
             font-family: 'JetBrains Mono', monospace;
             padding: 0.2rem 0.5rem;
             border-radius: 6px;
             font-size: 0.75rem;
             margin: 0.15rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .code-pill.moved {
-            background: rgba(16, 185, 129, 0.2);
-            color: #6ee7b7;
-            border-color: rgba(16, 185, 129, 0.6);
-            font-weight: 700;
-        }
-
-        .slot-card.has-moved {
-            border-color: rgba(16, 185, 129, 0.5);
-            background: linear-gradient(180deg, rgba(16, 185, 129, 0.06) 0%, rgba(17, 24, 39, 0.7) 100%);
+            border: 1px solid var(--border-subtle);
         }
 
         .toast {
             position: fixed;
             bottom: 24px;
             right: 24px;
-            background: #1e293b;
-            color: #fff;
+            background: #0f172a;
+            color: #ffffff;
             padding: 12px 20px;
             border-radius: 12px;
-            border: 1px solid var(--accent-emerald);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #3b82f6;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.25);
             z-index: 99999;
             display: flex;
             align-items: center;
@@ -613,10 +665,10 @@
                         </div>
 
                         <div id="courseDetailsPanel" style="display: none;">
-                            <div style="background: rgba(255,255,255,0.03); border-radius: 12px; padding: 1.25rem; border: 1px solid var(--border-color); margin-bottom: 1.25rem;">
+                            <div style="background: #f8fafc; border-radius: 12px; padding: 1.25rem; border: 1px solid var(--border-subtle); margin-bottom: 1.25rem;">
                                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                                     <div>
-                                        <h3 id="cCodeTitle" style="font-size: 1.4rem; font-weight: 800; color: #fff;">-</h3>
+                                        <h3 id="cCodeTitle" style="font-size: 1.4rem; font-weight: 800; color: var(--text-primary);">-</h3>
                                         <p id="cNameDesc" style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 0.2rem;">-</p>
                                     </div>
                                     <div style="text-align: right;">
@@ -624,12 +676,12 @@
                                         <div id="cEnrolled" style="font-size: 1.25rem; font-weight: 700; color: var(--accent-cyan);">-</div>
                                     </div>
                                 </div>
-                                <div style="margin-top: 0.85rem; padding-top: 0.85rem; border-top: 1px solid var(--border-color); font-size: 0.85rem;" id="cCurrentSlot">
+                                <div style="margin-top: 0.85rem; padding-top: 0.85rem; border-top: 1px solid var(--border-subtle); font-size: 0.85rem;" id="cCurrentSlot">
                                     Current Slot: -
                                 </div>
                             </div>
 
-                            <h4 style="font-size: 0.95rem; margin-bottom: 0.75rem; color: #fff; display: flex; justify-content: space-between;">
+                            <h4 style="font-size: 0.95rem; margin-bottom: 0.75rem; color: var(--text-primary); display: flex; justify-content: space-between;">
                                 <span>Mutually Exclusive Courses (Student Overlap)</span>
                                 <span id="conflictCountBadge" style="color: var(--accent-amber); font-weight: 600;">0 courses</span>
                             </h4>
@@ -654,7 +706,7 @@
                     <!-- Right: Slot Simulator & Safe Slots Recommender -->
                     <div>
                         <div id="slotSimulatorPanel" style="display: none;">
-                            <div class="card" style="margin-bottom: 1.25rem; background: rgba(255,255,255,0.02);">
+                            <div class="card" style="margin-bottom: 1.25rem; background: #f8fafc; border: 1px solid var(--border-subtle);">
                                 <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; color: #fff;">⚡ Slot Placement Simulator</h4>
                                 <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 1rem;">
                                     Test placing or moving this course into any timetable slot to verify whether it causes student double-booking.
@@ -704,7 +756,7 @@
         <!-- TAB: Draft Timetable Builder & Scenario Planner -->
         <div id="tab-draft" class="tab-content">
             <!-- Draft Header & Action Controls -->
-            <div class="card" style="border-left: 4px solid var(--accent-emerald);">
+            <div class="card" style="border-left: 4px solid #10b981;">
                 <div class="card-header" style="margin-bottom: 0.75rem;">
                     <div>
                         <div class="card-title" style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
@@ -733,21 +785,21 @@
 
                 <!-- Draft Metrics Row -->
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.85rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
-                    <div style="background: rgba(255,255,255,0.02); padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid var(--border-color);">
+                    <div style="background: #f8fafc; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid var(--border-subtle);">
                         <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Draft Clashes</div>
                         <div id="draftClashCountDisplay" style="font-size: 1.4rem; font-weight: 800; color: #34d399; margin-top: 0.2rem;">0 Clashes</div>
                     </div>
-                    <div style="background: rgba(255,255,255,0.02); padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid var(--border-color);">
+                    <div style="background: #f8fafc; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid var(--border-subtle);">
                         <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Courses Reassigned</div>
                         <div id="draftMovedCountDisplay" style="font-size: 1.4rem; font-weight: 800; color: #67e8f9; margin-top: 0.2rem;">0</div>
                     </div>
-                    <div style="background: rgba(255,255,255,0.02); padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid var(--border-color);">
+                    <div style="background: #f8fafc; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid var(--border-subtle);">
                         <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Total Exam Slots</div>
-                        <div id="draftSlotsCountDisplay" style="font-size: 1.4rem; font-weight: 800; color: #ffffff; margin-top: 0.2rem;">18</div>
+                        <div id="draftSlotsCountDisplay" style="font-size: 1.4rem; font-weight: 800; color: var(--text-primary); margin-top: 0.2rem;">18</div>
                     </div>
-                    <div style="background: rgba(255,255,255,0.02); padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid var(--border-color);">
+                    <div style="background: #f8fafc; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid var(--border-subtle);">
                         <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Draft Export Format</div>
-                        <div style="font-size: 0.95rem; font-weight: 700; color: #cbd5e1; margin-top: 0.4rem;">Color-Coded 4-Sheet Excel</div>
+                        <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-secondary); margin-top: 0.4rem;">Color-Coded 4-Sheet Excel</div>
                     </div>
                 </div>
             </div>
@@ -898,17 +950,17 @@
                 </div>
 
                 <div id="studentResultArea" style="display: none;">
-                    <div style="background: rgba(255,255,255,0.03); border-radius: 14px; padding: 1.5rem; border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
+                    <div style="background: #f8fafc; border-radius: 14px; padding: 1.5rem; border: 1px solid var(--border-subtle); margin-bottom: 1.5rem;">
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                             <div>
-                                <h3 id="stuRollDisplay" style="font-size: 1.3rem; font-weight: 800; color: #fff;">-</h3>
+                                <h3 id="stuRollDisplay" style="font-size: 1.3rem; font-weight: 800; color: var(--text-primary);">-</h3>
                                 <p id="stuEnrolledSummary" style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem;">-</p>
                             </div>
                             <div id="stuClashBadgeArea"></div>
                         </div>
                     </div>
 
-                    <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.75rem; color: #fff;">Exam Datesheet</h4>
+                    <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--text-primary);">Exam Datesheet</h4>
                     <div class="table-responsive">
                         <table>
                             <thead>
@@ -1360,8 +1412,8 @@
                     const item = document.createElement('div');
                     item.style.padding = '0.65rem 0.85rem';
                     item.style.borderRadius = '8px';
-                    item.style.background = 'rgba(16, 185, 129, 0.08)';
-                    item.style.border = '1px solid rgba(16, 185, 129, 0.25)';
+                    item.style.background = '#f0fdf4';
+                    item.style.border = '1px solid #bbf7d0';
                     item.style.display = 'flex';
                     item.style.justifyContent = 'space-between';
                     item.style.alignItems = 'center';
@@ -1376,7 +1428,7 @@
 
                     item.innerHTML = `
                         <div>
-                            <strong style="color: #6ee7b7;">${s.date} ${s.session}</strong>
+                            <strong style="color: #059669;">${s.date} ${s.session}</strong>
                             <div style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.15rem;">
                                 ${s.courses.length} courses &bull; Headcount: <strong>${beforeCount.toLocaleString()}</strong> &rarr; <strong style="color:#67e8f9">${afterCount.toLocaleString()}</strong> (+${diff})
                             </div>
@@ -1434,21 +1486,21 @@
                 const srcDiff = srcAfter - srcBefore; // negative relief
 
                 sourceStatsHtml = `
-                    <div style="background: rgba(17, 24, 39, 0.7); border: 1px solid var(--border-color); border-radius: 10px; padding: 0.85rem; margin-top: 0.65rem;">
+                    <div style="background: #ffffff; border: 1px solid var(--border-subtle); border-radius: 10px; padding: 0.85rem; margin-top: 0.65rem; box-shadow: var(--shadow-xs);">
                         <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--accent-amber); font-weight: 700; margin-bottom: 0.45rem; display: flex; justify-content: space-between; align-items: center;">
                             <span>Source Shift: ${srcSlot.full_name} (Current Slot)</span>
                             <span class="stat-badge" style="background: rgba(245, 158, 11, 0.15); color: #fcd34d;">Shift Relieved</span>
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; text-align: center;">
-                            <div style="background: rgba(255,255,255,0.02); padding: 0.5rem; border-radius: 8px;">
+                            <div style="background: #f8fafc; padding: 0.5rem; border-radius: 8px; border: 1px solid var(--border-subtle);">
                                 <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Before Move</div>
                                 <div style="font-size: 1.2rem; font-weight: 800; color: var(--text-primary); margin-top: 0.2rem;">${srcBefore.toLocaleString()}</div>
                             </div>
-                            <div style="background: rgba(255,255,255,0.02); padding: 0.5rem; border-radius: 8px; border: 1px solid rgba(245, 158, 11, 0.25);">
+                            <div style="background: #fffbeb; padding: 0.5rem; border-radius: 8px; border: 1px solid #fde68a;">
                                 <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">After Move</div>
                                 <div style="font-size: 1.2rem; font-weight: 800; color: #fcd34d; margin-top: 0.2rem;">${srcAfter.toLocaleString()}</div>
                             </div>
-                            <div style="background: rgba(255,255,255,0.02); padding: 0.5rem; border-radius: 8px;">
+                            <div style="background: #f8fafc; padding: 0.5rem; border-radius: 8px; border: 1px solid var(--border-subtle);">
                                 <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Net Relief</div>
                                 <div style="font-size: 1.2rem; font-weight: 800; color: #fca5a5; margin-top: 0.2rem;">${srcDiff}</div>
                             </div>
@@ -1460,7 +1512,7 @@
             // Headcount Counter Card
             const counterHtml = `
                 <div style="margin-top: 0.85rem; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem;">
-                    <div style="font-size: 0.85rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: space-between;">
+                    <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: space-between;">
                         <span style="display: flex; align-items: center; gap: 0.4rem;">
                             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                             Shift Student Headcount Counter
@@ -1469,21 +1521,21 @@
                     </div>
 
                     <!-- Target Shift Stats -->
-                    <div style="background: rgba(17, 24, 39, 0.7); border: 1px solid var(--border-color); border-radius: 10px; padding: 0.85rem;">
+                    <div style="background: #ffffff; border: 1px solid var(--border-subtle); border-radius: 10px; padding: 0.85rem; box-shadow: var(--shadow-xs);">
                         <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--accent-cyan); font-weight: 700; margin-bottom: 0.45rem; display: flex; justify-content: space-between; align-items: center;">
                             <span>Target Shift: ${res.slot_name}</span>
                             <span class="stat-badge" style="background: rgba(6, 182, 212, 0.15); color: #67e8f9;">Shift Added</span>
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; text-align: center;">
-                            <div style="background: rgba(255,255,255,0.02); padding: 0.5rem; border-radius: 8px;">
+                            <div style="background: #f8fafc; padding: 0.5rem; border-radius: 8px; border: 1px solid var(--border-subtle);">
                                 <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Before Move</div>
                                 <div style="font-size: 1.2rem; font-weight: 800; color: var(--text-primary); margin-top: 0.2rem;">${targetBefore.toLocaleString()}</div>
                             </div>
-                            <div style="background: rgba(255,255,255,0.02); padding: 0.5rem; border-radius: 8px; border: 1px solid rgba(6, 182, 212, 0.25);">
+                            <div style="background: #f0f9ff; padding: 0.5rem; border-radius: 8px; border: 1px solid #bae6fd;">
                                 <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">After Move</div>
                                 <div style="font-size: 1.2rem; font-weight: 800; color: #67e8f9; margin-top: 0.2rem;">${targetAfter.toLocaleString()}</div>
                             </div>
-                            <div style="background: rgba(255,255,255,0.02); padding: 0.5rem; border-radius: 8px;">
+                            <div style="background: #f8fafc; padding: 0.5rem; border-radius: 8px; border: 1px solid var(--border-subtle);">
                                 <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Net Load</div>
                                 <div style="font-size: 1.2rem; font-weight: 800; color: var(--accent-emerald); margin-top: 0.2rem;">+${targetDiff.toLocaleString()}</div>
                             </div>
