@@ -29,17 +29,11 @@
             --accent-violet: #8b5cf6;
             
             --gradient-primary: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
-            --gradient-card: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
             --glass-blur: blur(16px);
             --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-            --shadow-lg: 0 10px 25px -3px rgba(0, 0, 0, 0.5), 0 0 20px rgba(99, 102, 241, 0.15);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -55,10 +49,9 @@
             background-attachment: fixed;
         }
 
-        /* Top Header */
         header {
             border-bottom: 1px solid var(--border-color);
-            background: rgba(10, 15, 29, 0.8);
+            background: rgba(10, 15, 29, 0.85);
             backdrop-filter: var(--glass-blur);
             position: sticky;
             top: 0;
@@ -75,11 +68,7 @@
             gap: 1.5rem;
         }
 
-        .logo-group {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
+        .logo-group { display: flex; align-items: center; gap: 1rem; }
 
         .logo-badge {
             width: 44px;
@@ -104,16 +93,9 @@
             -webkit-text-fill-color: transparent;
         }
 
-        .header-titles p {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
+        .header-titles p { font-size: 0.8rem; color: var(--text-secondary); }
 
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
+        .header-actions { display: flex; align-items: center; gap: 0.75rem; }
 
         .btn {
             display: inline-flex;
@@ -146,11 +128,8 @@
             border-color: var(--border-color);
         }
 
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.1); }
 
-        /* Stats Bar */
         .stats-bar {
             max-width: 1400px;
             margin: 1.75rem auto 0;
@@ -179,16 +158,12 @@
         .stat-card::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
+            top: 0; left: 0; right: 0; height: 3px;
             background: var(--accent-primary);
         }
 
         .stat-card.alert::before { background: var(--accent-rose); }
         .stat-card.warning::before { background: var(--accent-amber); }
-        .stat-card.success::before { background: var(--accent-emerald); }
         .stat-card.cyan::before { background: var(--accent-cyan); }
 
         .stat-label {
@@ -228,7 +203,6 @@
             50% { opacity: 0.5; }
         }
 
-        /* Main Container & Tabs */
         main {
             max-width: 1400px;
             margin: 1.5rem auto 3rem;
@@ -271,21 +245,9 @@
             box-shadow: 0 2px 10px rgba(99, 102, 241, 0.35);
         }
 
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.25s ease-in-out;
-        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
 
-        .tab-content.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Glass Card */
         .card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -314,12 +276,7 @@
             gap: 0.6rem;
         }
 
-        /* Search Controls */
-        .search-box {
-            position: relative;
-            flex: 1;
-            max-width: 450px;
-        }
+        .search-box { position: relative; flex: 1; max-width: 450px; }
 
         .search-input {
             width: 100%;
@@ -347,7 +304,6 @@
             pointer-events: none;
         }
 
-        /* Tables */
         .table-responsive {
             width: 100%;
             overflow-x: auto;
@@ -355,12 +311,7 @@
             border: 1px solid var(--border-color);
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            font-size: 0.88rem;
-        }
+        table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
 
         th {
             background: rgba(255, 255, 255, 0.03);
@@ -379,13 +330,8 @@
             color: var(--text-primary);
         }
 
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        tr:hover td {
-            background: rgba(255, 255, 255, 0.02);
-        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(255, 255, 255, 0.02); }
 
         .code-pill {
             display: inline-block;
@@ -414,7 +360,6 @@
             animation: pulse 2.5s infinite;
         }
 
-        /* Timetable Grid View */
         .timetable-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
@@ -448,11 +393,7 @@
             margin-bottom: 0.85rem;
         }
 
-        .slot-title {
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: #fff;
-        }
+        .slot-title { font-size: 0.95rem; font-weight: 700; color: #fff; }
 
         .slot-badge {
             font-size: 0.72rem;
@@ -474,13 +415,8 @@
             border: 1px solid rgba(168, 85, 247, 0.3);
         }
 
-        .course-tag-cloud {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.45rem;
-        }
+        .course-tag-cloud { display: flex; flex-wrap: wrap; gap: 0.45rem; }
 
-        /* Inspector Layout */
         .inspector-layout {
             display: grid;
             grid-template-columns: 1.2fr 1fr;
@@ -488,9 +424,7 @@
         }
 
         @media (max-width: 992px) {
-            .inspector-layout {
-                grid-template-columns: 1fr;
-            }
+            .inspector-layout { grid-template-columns: 1fr; }
         }
 
         .select-styled {
@@ -505,9 +439,7 @@
             cursor: pointer;
         }
 
-        .select-styled:focus {
-            border-color: var(--accent-primary);
-        }
+        .select-styled:focus { border-color: var(--accent-primary); }
 
         .clash-box {
             border-radius: 12px;
@@ -550,7 +482,7 @@
                 </div>
             </div>
             <div class="header-actions">
-                <a href="/api/export" class="btn btn-primary" download>
+                <a href="/Exam_Clash_Audit_Report.xlsx" class="btn btn-primary" download="Exam_Clash_Audit_Report.xlsx">
                     <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                     Export Excel Report
                 </a>
@@ -823,42 +755,116 @@
         const FALLBACK_COURSES = [{"code": "CB2101", "name": "Introduction to Chemical Engineering", "enrolled": 66}, {"code": "CB2102", "name": "Fluid Mechanics", "enrolled": 66}, {"code": "CB2103", "name": "Heat Transfer", "enrolled": 66}, {"code": "CB2104", "name": "Chemical Process Calculations", "enrolled": 66}, {"code": "CB2105", "name": "Chemical Engineering Thermodynamics", "enrolled": 66}, {"code": "CB3101", "name": "Mass Transfer-II", "enrolled": 63}, {"code": "CB3102", "name": "Chemical Process Technology", "enrolled": 63}, {"code": "CB3103", "name": "Process Equipment Design", "enrolled": 63}, {"code": "CB3104", "name": "Chemical Reaction Engineering-II", "enrolled": 63}, {"code": "CB3105", "name": "Chemical Process Modeling and Simulation", "enrolled": 63}, {"code": "CB3106", "name": "Introduction to Sustainable Engineering", "enrolled": 162}, {"code": "CB4103", "name": "Molecular Modeling and Simulation", "enrolled": 60}, {"code": "CB4107", "name": "Combustion Engineering and Technology", "enrolled": 60}, {"code": "CB4108", "name": "Bioprocess Engineering", "enrolled": 140}, {"code": "CB5101", "name": "Advanced Reaction Engineering", "enrolled": 7}, {"code": "CB5102", "name": "Advanced Heat Transfer", "enrolled": 7}, {"code": "CB5103", "name": "Introduction to Computational Techniques", "enrolled": 7}, {"code": "CB6104", "name": "Preparative Chromatography", "enrolled": 17}, {"code": "CB6105", "name": "CO\u2082 Capture and Utilization", "enrolled": 23}, {"code": "CE1101", "name": "Engineering Graphics", "enrolled": 376}, {"code": "CE2101", "name": "Geomatics Engineering", "enrolled": 93}, {"code": "CE2102", "name": "Structural Mechanics", "enrolled": 93}, {"code": "CE2103", "name": "Fluid Mechanics", "enrolled": 93}, {"code": "CE2104", "name": "Geology for Engineers", "enrolled": 93}, {"code": "CE3101", "name": "Design of Reinforced Concrete Structures", "enrolled": 75}, {"code": "CE3102", "name": "Foundation Engineering", "enrolled": 75}, {"code": "CE3103", "name": "Transportation Engineering - I", "enrolled": 75}, {"code": "CE3104", "name": "Environmental Engineering - I", "enrolled": 75}, {"code": "CE4101", "name": "Introduction to Bridge Engineering", "enrolled": 41}, {"code": "CE4104", "name": "Matrix Method for Structural Analysis", "enrolled": 34}, {"code": "CE4106", "name": "Irrigation Engineering and Hydraulic Structures", "enrolled": 75}, {"code": "CE5101", "name": "Chemistry for Environmental Engineers", "enrolled": 11}, {"code": "CE5102", "name": "Physico-Chemical Principles and Processes", "enrolled": 11}, {"code": "CE5103", "name": "Solid and Hazardous Waste Management", "enrolled": 11}, {"code": "CE5104", "name": "Geotechnical Exploration", "enrolled": 11}, {"code": "CE5105", "name": "Advanced Soil Mechanics", "enrolled": 23}, {"code": "CE5106", "name": "Rock Engineering", "enrolled": 16}, {"code": "CE5107", "name": "Engineering Behaviour of Rock", "enrolled": 5}, {"code": "CE5108", "name": "Advanced Structural Analysis", "enrolled": 14}, {"code": "CE5109", "name": "Structural Dynamics", "enrolled": 21}, {"code": "CE5110", "name": "Theory of Plates and Shells", "enrolled": 14}, {"code": "CE5111", "name": "Urban Transportation Planning", "enrolled": 10}, {"code": "CE5112", "name": "Pavement Analysis and Design", "enrolled": 10}, {"code": "CE5113", "name": "Traffic Engineering and Management", "enrolled": 10}, {"code": "CE6101", "name": "Atmospheric Physics and Chemistry", "enrolled": 14}, {"code": "CE6109", "name": "Geoenvironmental Engineering", "enrolled": 36}, {"code": "CE6116", "name": "Bridge Engineering and Design", "enrolled": 19}, {"code": "CE6119", "name": "Special Topics in Structural Analysis", "enrolled": 4}, {"code": "CE6120", "name": "Analysis of Plates and Shells Structures", "enrolled": 1}, {"code": "CE6124", "name": "Advanced Structural Dynamics", "enrolled": 1}, {"code": "CE6125", "name": "Bituminous Materials", "enrolled": 15}, {"code": "CE6128", "name": "Highway Geometric Design and Safety", "enrolled": 31}, {"code": "CE6130", "name": "Analytical Methods in Civil Engineering", "enrolled": 22}, {"code": "CE6133", "name": "Advanced Engineering Behavior of Rocks", "enrolled": 3}, {"code": "CE6135", "name": "Advanced Rock Engineering", "enrolled": 2}, {"code": "CH001", "name": "Prep", "enrolled": 8}, {"code": "CH1101", "name": "Chemistry", "enrolled": 369}, {"code": "CH2101", "name": "Organic Chemistry", "enrolled": 41}, {"code": "CH2102", "name": "Inorganic Chemistry", "enrolled": 41}, {"code": "CH2103", "name": "Introduction to Quantum Chemistry", "enrolled": 41}, {"code": "CH2104", "name": "Fluid Mechanics", "enrolled": 41}, {"code": "CH2105", "name": "Chemical Process Calculations", "enrolled": 41}, {"code": "CH3101", "name": "Macromolecular Science and Engineering", "enrolled": 36}, {"code": "CH3102", "name": "Design and Applications of Nanomaterials", "enrolled": 36}, {"code": "CH3103", "name": "Chemical Kinetics and Electrochemistry", "enrolled": 36}, {"code": "CH3104", "name": "Techniques for Chemical Analysis", "enrolled": 36}, {"code": "CH4101", "name": "Quantum Chemistry", "enrolled": 26}, {"code": "CH4102", "name": "Organic Chemistry - I", "enrolled": 26}, {"code": "CH4103", "name": "Inorganic Chemistry - I", "enrolled": 26}, {"code": "CH4104", "name": "Principles of Molecular Spectroscopy", "enrolled": 26}, {"code": "CH4105", "name": "Symmetry & Group Theory", "enrolled": 26}, {"code": "CH4108", "name": "Dyes, Paints and Pigments", "enrolled": 32}, {"code": "CH4109", "name": "Group Theory and Spectroscopy", "enrolled": 32}, {"code": "CH5102", "name": "Inorganic Chemistry - III", "enrolled": 26}, {"code": "CH5103", "name": "Organic Chemistry - III", "enrolled": 26}, {"code": "CH5105", "name": "Basic Polymer Chemistry", "enrolled": 26}, {"code": "CH7103", "name": "Nanotechnology for Biomedical Applications", "enrolled": 13}, {"code": "CS1101", "name": "Foundations of Programming", "enrolled": 749}, {"code": "CS2101", "name": "Algorithm", "enrolled": 155}, {"code": "CS2102", "name": "Digital Logic and Computer Organization", "enrolled": 155}, {"code": "CS2103", "name": "Artificial Intelligence Concepts", "enrolled": 155}, {"code": "CS2104", "name": "Discrete Mathematics", "enrolled": 155}, {"code": "CS2105", "name": "Optimization Techniques", "enrolled": 155}, {"code": "CS3101", "name": "Operating System", "enrolled": 171}, {"code": "CS3102", "name": "Computer Network", "enrolled": 172}, {"code": "CS3103", "name": "Machine Learning", "enrolled": 171}, {"code": "CS3104", "name": "Compiler", "enrolled": 111}, {"code": "CS3105", "name": "Natural Language Processing", "enrolled": 60}, {"code": "CS3106", "name": "Computer Graphics", "enrolled": 158}, {"code": "CS4101", "name": "Pattern Recognition", "enrolled": 160}, {"code": "CS4110", "name": "Blockchain Technology", "enrolled": 160}, {"code": "CS4113", "name": "Data Analysis and Visualization", "enrolled": 142}, {"code": "CS5101", "name": "Design and Analysis of Algorithms", "enrolled": 92}, {"code": "CS5102", "name": "Foundations of Computer Systems", "enrolled": 80}, {"code": "CS6101", "name": "Advanced Blockchain Technology", "enrolled": 24}, {"code": "CS6103", "name": "Advanced Pattern Recognition", "enrolled": 98}, {"code": "CS6109", "name": "Reinforcement Learning", "enrolled": 101}, {"code": "CS6112", "name": "Drone Data Processing & Analysis", "enrolled": 130}, {"code": "EC2101", "name": "Analog Circuits", "enrolled": 131}, {"code": "EC2102", "name": "Signals and Systems", "enrolled": 131}, {"code": "EC2103", "name": "Semiconductor Devices", "enrolled": 71}, {"code": "EC3101", "name": "Microcontroller and Embedded System", "enrolled": 142}, {"code": "EC3102", "name": "VLSI Design", "enrolled": 80}, {"code": "EC3103", "name": "Analog Communication", "enrolled": 80}, {"code": "EC3104", "name": "Engineering Electromagnetics", "enrolled": 142}, {"code": "EC3105", "name": "Random Signals and Stochastic Processes", "enrolled": 144}, {"code": "EC4102", "name": "Deep Learning for Video Surveillance Systems", "enrolled": 134}, {"code": "EC4105", "name": "Digital Image Processing", "enrolled": 134}, {"code": "EC5101", "name": "Information Theory and Coding", "enrolled": 24}, {"code": "EC5102", "name": "Advanced Digital Signal Processing", "enrolled": 15}, {"code": "EC5103", "name": "Antenna and Microwave Devices", "enrolled": 15}, {"code": "EC5104", "name": "Digital VLSI System", "enrolled": 34}, {"code": "EC5105", "name": "Embedded System", "enrolled": 34}, {"code": "EC5106", "name": "Semiconductor Device Modeling and Simulation", "enrolled": 8}, {"code": "EC5110", "name": "Advanced Digital Image Processing", "enrolled": 6}, {"code": "EC5113", "name": "Quantum Computing", "enrolled": 2}, {"code": "EC5114", "name": "Opto-Electronics Materials and Devices", "enrolled": 23}, {"code": "EC5119", "name": "Quantum Computing", "enrolled": 8}, {"code": "EC6101", "name": "Advanced Antenna and Microwave Devices", "enrolled": 13}, {"code": "EE1101", "name": "Electrical Sciences", "enrolled": 376}, {"code": "EE2101", "name": "Measurements and Instrumentation", "enrolled": 131}, {"code": "EE2102", "name": "Network Analysis and Synthesis", "enrolled": 131}, {"code": "EE2103", "name": "Electrical Machines \u2013 I", "enrolled": 60}, {"code": "EE3101", "name": "Power Systems - I", "enrolled": 62}, {"code": "EE3102", "name": "Modern Control Theory", "enrolled": 62}, {"code": "EE5101", "name": "Computer Aided Power System Analysis", "enrolled": 16}, {"code": "EE5102", "name": "Advanced Power Electronics Converters", "enrolled": 8}, {"code": "EE5103", "name": "FACTS and Its Applications", "enrolled": 8}, {"code": "EE6103", "name": "Multivariable Control System", "enrolled": 16}, {"code": "EE6104", "name": "Advanced Power System Protection", "enrolled": 18}, {"code": "EE6117", "name": "Multivariable Control System", "enrolled": 8}, {"code": "EP2101", "name": "Quantum Physics", "enrolled": 46}, {"code": "EP2102", "name": "Optics and Lasers", "enrolled": 42}, {"code": "EP2103", "name": "Classical Dynamics: Discrete and Continuum Systems", "enrolled": 42}, {"code": "EP2104", "name": "Thermal Physics with Engineering Applications", "enrolled": 42}, {"code": "EP3101", "name": "Computational Techniques", "enrolled": 33}, {"code": "EP3102", "name": "Data Science for Physicists", "enrolled": 33}, {"code": "EP3103", "name": "Digital Electronics and Microprocessors", "enrolled": 33}, {"code": "EP3104", "name": "Solid State Physics", "enrolled": 33}, {"code": "EP3105", "name": "Instrumentation Techniques", "enrolled": 33}, {"code": "EP4105", "name": "Quantum Technology Laboratory", "enrolled": 26}, {"code": "HS001", "name": "Prep", "enrolled": 8}, {"code": "HS1101", "name": "English for Professionals", "enrolled": 749}, {"code": "HS2101", "name": "Mathematical Statistics", "enrolled": 87}, {"code": "HS2102", "name": "Fundamentals of Economics", "enrolled": 26}, {"code": "HS2103", "name": "Multivariate Analysis and Basic Econometrics", "enrolled": 26}, {"code": "HS2104", "name": "History of Economic Thought", "enrolled": 26}, {"code": "HS2105", "name": "Probability and Stochastic Processes.", "enrolled": 26}, {"code": "HS2110", "name": "Language Human Mind and Indian Society", "enrolled": 260}, {"code": "HS2111", "name": "Introductory Sociology", "enrolled": 234}, {"code": "HS2112", "name": "Introduction to Demography", "enrolled": 260}, {"code": "HS2114", "name": "Data Science (Pre-requisite IIM Mumbai)", "enrolled": 15}, {"code": "HS2115", "name": "Introductory Microeconomics (Pre-requisite IIM Mumbai)", "enrolled": 15}, {"code": "HS3101", "name": "Econometrics - II", "enrolled": 23}, {"code": "HS3102", "name": "Mathematical Economics", "enrolled": 87}, {"code": "HS3103", "name": "International Trade and Investment", "enrolled": 23}, {"code": "HS3104", "name": "Debate in Indian Economy", "enrolled": 23}, {"code": "HS3108", "name": "Innovation and Entrepreneurship (Pre-requisite IIM Mumbai)", "enrolled": 157}, {"code": "HS3111", "name": "Cross-Cultural Management,", "enrolled": 5}, {"code": "HS4109", "name": "Corporate Finance", "enrolled": 22}, {"code": "HS4111", "name": "HR Analytics", "enrolled": 73}, {"code": "HS4118", "name": "Sociology of Development", "enrolled": 330}, {"code": "HS4119", "name": "Industrial Psychology (Pre-requisite IIM Mumbai)", "enrolled": 351}, {"code": "HS4123", "name": "Supply Chain Management (Pre-requisite IIM Mumbai)", "enrolled": 14}, {"code": "HS5111", "name": "Technical Writing and Soft Skill", "enrolled": 249}, {"code": "HS7101", "name": "Representation of Gender in Literature", "enrolled": 10}, {"code": "HS7103", "name": "Population and Public Health", "enrolled": 4}, {"code": "HS7104", "name": "Literary Representation of the Post-Colonial Nation", "enrolled": 7}, {"code": "HS7105", "name": "Theories of Knowing in Contemporary Society", "enrolled": 6}, {"code": "HS7106", "name": "Econometrics", "enrolled": 6}, {"code": "MA001", "name": "Prep", "enrolled": 8}, {"code": "MA1101", "name": "Calculus and Linear Algebra", "enrolled": 749}, {"code": "MA2101", "name": "Design and Analysis of Algorithms", "enrolled": 63}, {"code": "MA2102", "name": "Probability and Stochastic Processes", "enrolled": 63}, {"code": "MA2103", "name": "Optimization Techniques", "enrolled": 63}, {"code": "MA2104", "name": "Algebra", "enrolled": 63}, {"code": "MA2105", "name": "Discrete Mathematics", "enrolled": 63}, {"code": "MA3101", "name": "Ordinary and Partial Differential Equations", "enrolled": 71}, {"code": "MA3102", "name": "Complex Analysis", "enrolled": 71}, {"code": "MA3103", "name": "Theory of Computation", "enrolled": 71}, {"code": "MA3104", "name": "Computer Networks", "enrolled": 71}, {"code": "MA3105", "name": "Operating Systems", "enrolled": 71}, {"code": "MA4103", "name": "Rings and Modules", "enrolled": 65}, {"code": "MA4106", "name": "Mathematical Finance", "enrolled": 65}, {"code": "MA4107", "name": "Number Theory and Algebra", "enrolled": 22}, {"code": "MA4108", "name": "Theory of Relativity", "enrolled": 23}, {"code": "MA4109", "name": "Real Analysis", "enrolled": 22}, {"code": "MA4110", "name": "Algebra", "enrolled": 22}, {"code": "MA4111", "name": "Ordinary Differential Equations", "enrolled": 22}, {"code": "MA5101", "name": "Measure Theory", "enrolled": 21}, {"code": "MA5102", "name": "Functional Analysis", "enrolled": 21}, {"code": "MA5103", "name": "Partial Differential Equations", "enrolled": 21}, {"code": "MA5104", "name": "Cryptography and Network Security", "enrolled": 10}, {"code": "MA5106", "name": "Mathematical Finance", "enrolled": 29}, {"code": "MA6106", "name": "Large Language Models (LLMs)", "enrolled": 29}, {"code": "MA6109", "name": "Mathematical Modeling", "enrolled": 47}, {"code": "MA7102", "name": "Algebra", "enrolled": 14}, {"code": "MC5101", "name": "Design and Analysis of Algorithms", "enrolled": 29}, {"code": "MC5102", "name": "Probability and Statistics", "enrolled": 18}, {"code": "ME1102", "name": "Engineering Mechanics", "enrolled": 364}, {"code": "ME2101", "name": "Dynamics", "enrolled": 105}, {"code": "ME2102", "name": "Thermodynamics", "enrolled": 105}, {"code": "ME2103", "name": "Fluid Mechanics", "enrolled": 105}, {"code": "ME2104", "name": "Engineering Materials", "enrolled": 105}, {"code": "ME3101", "name": "Data Analytics and Machine Learning Tools for Engineers", "enrolled": 96}, {"code": "ME3102", "name": "Design of Machine Elements", "enrolled": 96}, {"code": "ME3103", "name": "Manufacturing Technology - I", "enrolled": 96}, {"code": "ME3104", "name": "Engineering Software Laboratory", "enrolled": 96}, {"code": "ME3105", "name": "Numerical Methods for Engineers", "enrolled": 96}, {"code": "ME3106", "name": "Automotive Technology", "enrolled": 112}, {"code": "ME4101", "name": "Tribology and Surface Engineering", "enrolled": 64}, {"code": "ME4102", "name": "Basics of Computational Fluid Dynamics", "enrolled": 28}, {"code": "ME4103", "name": "Industrial Automation", "enrolled": 104}, {"code": "ME4105", "name": "Mathematical Modelling of Computer Aided Design", "enrolled": 13}, {"code": "ME4106", "name": "Energy Engineering", "enrolled": 79}, {"code": "ME5101", "name": "Advanced Engineering Mathematics", "enrolled": 48}, {"code": "ME5102", "name": "Theory of Elasticity", "enrolled": 7}, {"code": "ME5103", "name": "Finite Element Analysis", "enrolled": 17}, {"code": "ME5105", "name": "Advanced Fluid Mechanics", "enrolled": 14}, {"code": "ME5106", "name": "Gas Dynamics and Propulsion", "enrolled": 14}, {"code": "ME5108", "name": "Deformation-based Manufacturing", "enrolled": 10}, {"code": "ME6102", "name": "Computational Fluid Dynamics", "enrolled": 19}, {"code": "ME6104", "name": "Refrigeration and Air-Conditioning", "enrolled": 14}, {"code": "ME6106", "name": "Mobile Robotics", "enrolled": 20}, {"code": "ME6107", "name": "Digital Manufacturing and Industry 4.0", "enrolled": 20}, {"code": "ME6109", "name": "Vehicle Dynamics and Multi-body Systems", "enrolled": 20}, {"code": "ME6111", "name": "Advanced Manufacturing Processes", "enrolled": 13}, {"code": "ME6113", "name": "Soft Computing Engineering", "enrolled": 100}, {"code": "MH5101", "name": "Fundamentals of Mechatronics", "enrolled": 26}, {"code": "MM2101", "name": "Introduction to Metallurgical and Materials Engineering", "enrolled": 47}, {"code": "MM2102", "name": "Mineral Processing and Process Metallurgy", "enrolled": 47}, {"code": "MM2103", "name": "Thermodynamics and Phase Equilibria", "enrolled": 47}, {"code": "MM2104", "name": "Transport Phenomena", "enrolled": 47}, {"code": "MM2105", "name": "Fundamentals of Polymer Science and Technology", "enrolled": 47}, {"code": "MM3101", "name": "Thermomechanical Processing of Metallic Materials", "enrolled": 39}, {"code": "MM3102", "name": "Computational Materials Science", "enrolled": 39}, {"code": "MM3103", "name": "Engineering Polymers", "enrolled": 39}, {"code": "MM3104", "name": "Ceramic Science and Technology", "enrolled": 39}, {"code": "MM3106", "name": "Microscopy and X-ray Diffraction", "enrolled": 160}, {"code": "MM4102", "name": "Glass Science and Technology", "enrolled": 35}, {"code": "MM4105", "name": "Heat Treatment of Metals and Alloys", "enrolled": 35}, {"code": "MM4107", "name": "Nanomaterials", "enrolled": 142}, {"code": "MM5101", "name": "Thermodynamics and Phase Transformation", "enrolled": 13}, {"code": "MM5102", "name": "Concepts in Materials Science", "enrolled": 13}, {"code": "MM5103", "name": "Mechanical Behavior of Materials", "enrolled": 13}, {"code": "MM5104", "name": "Nano-structured Materials", "enrolled": 13}, {"code": "MM6101", "name": "Processing Technology of Metal, Ceramic and Composites", "enrolled": 20}, {"code": "MM6105", "name": "Structural Characterization of Materials", "enrolled": 25}, {"code": "PH001", "name": "Prep", "enrolled": 8}, {"code": "PH1101", "name": "Physics", "enrolled": 380}, {"code": "PH4101", "name": "Mathematical Physics - I", "enrolled": 25}, {"code": "PH4102", "name": "Classical Mechanics", "enrolled": 25}, {"code": "PH4103", "name": "Quantum Mechanics - I", "enrolled": 25}, {"code": "PH4104", "name": "Numerical Techniques", "enrolled": 25}, {"code": "PH4105", "name": "Electronics", "enrolled": 25}, {"code": "PH4107", "name": "Optical Quantum Communication", "enrolled": 22}, {"code": "PH4109", "name": "Electronic Devices and Circuits", "enrolled": 9}, {"code": "PH4110", "name": "Photovoltaics and Fuel Cell Technology", "enrolled": 139}, {"code": "PH5101", "name": "Atomic and Molecular Physics", "enrolled": 22}, {"code": "PH5102", "name": "Condensed Matter Physics - I", "enrolled": 22}, {"code": "PH5105", "name": "Nanophotonics", "enrolled": 10}, {"code": "PH5111", "name": "Magnetism at Nanoscale", "enrolled": 6}, {"code": "PH5113", "name": "Quantum Field Theory (QFT)", "enrolled": 6}, {"code": "PH6119", "name": "Quantum Field Theory", "enrolled": 3}, {"code": "PH6124", "name": "Nanoscience and Nanoharacterization", "enrolled": 72}, {"code": "PH7104", "name": "Experimental Techniques and Scientific Presentation", "enrolled": 13}];
 
         let allCourses = FALLBACK_COURSES;
-        let timetableData = [];
-        let summaryData = null;
+        let DB = null;
+        let courseStudentSets = {};
+        let conflictGraph = {};
+        let courseToSlots = {};
+        let timetableSlots = [];
+        let auditClashes = [];
+        let duplicateCourses = {};
 
-        // Resilient initialization
+        // 1. Initialize
         async function init() {
-            // 1. Instantly populate dropdown from 266 course catalog
+            // Instantly render dropdown from 266 courses
             populateCourseDropdown(allCourses);
 
-            // 2. Fetch live data independently
+            // Fetch the complete database (static /data.json, ~470 KB)
             try {
-                summaryData = await fetch('/api/summary').then(r => r.json());
-                renderStats();
-                renderAuditReport();
-            } catch (err) {
-                console.warn('Summary fetch notice:', err);
-            }
-
-            try {
-                const courRes = await fetch('/api/courses').then(r => r.json());
-                if (Array.isArray(courRes) && courRes.length > 0) {
-                    allCourses = courRes;
-                    populateCourseDropdown(allCourses);
+                const res = await fetch('/data.json');
+                if (res.ok) {
+                    DB = await res.json();
+                } else {
+                    console.warn("Could not load /data.json via HTTP, checking alternative source...");
                 }
             } catch (err) {
-                console.warn('Courses fetch notice:', err);
+                console.warn("Fetch error:", err);
             }
 
-            try {
-                timetableData = await fetch('/api/timetable').then(r => r.json());
-                if (Array.isArray(timetableData) && timetableData.length > 0) {
-                    populateSimulatorSlots();
-                    renderTimetableGrid();
-                }
-            } catch (err) {
-                console.warn('Timetable fetch notice:', err);
+            if (DB) {
+                buildEngine(DB);
             }
+        }
+
+        // 2. Client-Side High-Performance Graph & Audit Engine
+        function buildEngine(data) {
+            console.time("engine_build");
+
+            // Course student sets
+            courseStudentSets = {};
+            for (const [code, info] of Object.entries(data.courses)) {
+                courseStudentSets[code] = new Set(info.students);
+            }
+
+            // Conflict graph (all pairs)
+            conflictGraph = {};
+            const codes = Object.keys(data.courses);
+            codes.forEach(c => conflictGraph[c] = {});
+
+            for (let i = 0; i < codes.length; i++) {
+                const c1 = codes[i];
+                const s1 = courseStudentSets[c1];
+                for (let j = i + 1; j < codes.length; j++) {
+                    const c2 = codes[j];
+                    const s2 = courseStudentSets[c2];
+                    const overlap = [];
+                    for (const stu of s1) {
+                        if (s2.has(stu)) overlap.push(stu);
+                    }
+                    if (overlap.length > 0) {
+                        conflictGraph[c1][c2] = overlap;
+                        conflictGraph[c2][c1] = overlap;
+                    }
+                }
+            }
+
+            // Slots & Course mapping
+            timetableSlots = data.slots || [];
+            courseToSlots = {};
+            timetableSlots.forEach(s => {
+                s.courses.forEach(c => {
+                    if (!courseToSlots[c]) courseToSlots[c] = [];
+                    courseToSlots[c].push(s);
+                });
+            });
+
+            // Timetable audit
+            auditClashes = [];
+            timetableSlots.forEach(s => {
+                const clashingInSlot = [];
+                for (let i = 0; i < s.courses.length; i++) {
+                    const c1 = s.courses[i];
+                    for (let j = i + 1; j < s.courses.length; j++) {
+                        const c2 = s.courses[j];
+                        const overlap = conflictGraph[c1]?.[c2];
+                        if (overlap && overlap.length > 0) {
+                            auditClashes.push({
+                                date: s.date,
+                                slot: s.slot_name,
+                                course_a: c1,
+                                course_b: c2,
+                                overlap_count: overlap.length,
+                                students: overlap
+                            });
+                        }
+                    }
+                }
+            });
+
+            // Duplicate scheduled courses
+            duplicateCourses = {};
+            for (const [c, sls] of Object.entries(courseToSlots)) {
+                if (sls.length > 1) {
+                    duplicateCourses[c] = sls.map(s => s.full_name);
+                }
+            }
+
+            console.timeEnd("engine_build");
+
+            // Render all UI views
+            renderStats();
+            populateSimulatorSlots();
+            renderTimetableGrid();
+            renderAuditReport();
 
             // Select default course
             const urlParams = new URLSearchParams(window.location.search);
@@ -879,12 +885,14 @@
         }
 
         function renderStats() {
-            if (!summaryData) return;
-            document.getElementById('statStudents').textContent = summaryData.total_students.toLocaleString();
-            document.getElementById('statCourses').textContent = summaryData.total_courses.toLocaleString();
-            document.getElementById('statSlots').textContent = summaryData.total_slots;
-            document.getElementById('clashCount').textContent = summaryData.total_clashes;
-            document.getElementById('auditClashBadge').textContent = `${summaryData.total_clashes} Slot Clash${summaryData.total_clashes === 1 ? '' : 'es'}`;
+            if (!DB) return;
+            const totalStus = Object.keys(DB.students).length;
+            const totalCourses = Object.keys(DB.courses).length;
+            document.getElementById('statStudents').textContent = totalStus.toLocaleString();
+            document.getElementById('statCourses').textContent = totalCourses.toLocaleString();
+            document.getElementById('statSlots').textContent = timetableSlots.length;
+            document.getElementById('clashCount').textContent = auditClashes.length;
+            document.getElementById('auditClashBadge').textContent = `${auditClashes.length} Slot Clash${auditClashes.length === 1 ? '' : 'es'}`;
         }
 
         function populateCourseDropdown(courses) {
@@ -911,7 +919,7 @@
         function populateSimulatorSlots() {
             const select = document.getElementById('simulateSlotSelect');
             select.innerHTML = '<option value="">-- Choose Exam Slot to Test --</option>';
-            timetableData.forEach((s, idx) => {
+            timetableSlots.forEach(s => {
                 const opt = document.createElement('option');
                 opt.value = s.id;
                 opt.textContent = `${s.date} ${s.session} (${s.courses.length} courses)`;
@@ -919,142 +927,178 @@
             });
         }
 
-        async function onCourseSelected() {
+        function checkCourseInSlot(courseCode, slotId) {
+            const slot = timetableSlots.find(s => s.id === slotId);
+            if (!slot) return { has_clash: false, clashes: [], total_affected: 0, slot_name: "" };
+
+            const clashes = [];
+            const affectedStudents = new Set();
+
+            slot.courses.forEach(c => {
+                if (c !== courseCode) {
+                    const overlap = conflictGraph[courseCode]?.[c];
+                    if (overlap && overlap.length > 0) {
+                        clashes.push({
+                            clashing_course: c,
+                            course_name: DB.courses[c]?.name || c,
+                            overlap_count: overlap.length,
+                            students: overlap
+                        });
+                        overlap.forEach(st => affectedStudents.add(st));
+                    }
+                }
+            });
+
+            return {
+                has_clash: clashes.length > 0,
+                clashes: clashes,
+                total_affected: affectedStudents.size,
+                affected_students: Array.from(affectedStudents),
+                slot_name: slot.full_name
+            };
+        }
+
+        function onCourseSelected() {
             const courseCode = document.getElementById('courseSelect').value;
-            if (!courseCode) {
+            if (!courseCode || !DB) {
                 document.getElementById('courseDetailsPanel').style.display = 'none';
                 document.getElementById('slotSimulatorPanel').style.display = 'none';
                 return;
             }
 
-            try {
-                const data = await fetch(`/api/course/${courseCode}`).then(r => r.json());
-                if (!data || data.error) {
-                    console.warn("Course data notice:", data?.error);
-                    return;
-                }
-                document.getElementById('courseDetailsPanel').style.display = 'block';
-                document.getElementById('slotSimulatorPanel').style.display = 'block';
+            const cInfo = DB.courses[courseCode];
+            if (!cInfo) return;
 
-                document.getElementById('cCodeTitle').textContent = data.code;
-                document.getElementById('cNameDesc').textContent = data.name;
-                document.getElementById('cEnrolled').textContent = data.enrolled + " Students";
+            document.getElementById('courseDetailsPanel').style.display = 'block';
+            document.getElementById('slotSimulatorPanel').style.display = 'block';
 
-                // Slot info
-                const currentSlotEl = document.getElementById('cCurrentSlot');
-                if (data.scheduled_slots && data.scheduled_slots.length > 0) {
-                    const slotBadges = data.scheduled_slots.map(s => {
-                        return `<span class="code-pill ${s.has_clash ? 'clash' : ''}" style="margin-left: 0.4rem;">
-                            ${s.full_name} ${s.has_clash ? '⚠️ CLASH' : '✓'}
-                        </span>`;
-                    }).join(' ');
-                    currentSlotEl.innerHTML = `<strong>Scheduled in:</strong> ${slotBadges}`;
-                } else {
-                    currentSlotEl.innerHTML = `<span style="color: var(--accent-rose);">⚠️ Currently Unscheduled in Timetable</span>`;
-                }
+            document.getElementById('cCodeTitle').textContent = courseCode;
+            document.getElementById('cNameDesc').textContent = cInfo.name;
+            document.getElementById('cEnrolled').textContent = (cInfo.enrolled_count || cInfo.students.length) + " Students";
 
-                // Render Conflicts
-                document.getElementById('conflictCountBadge').textContent = `${data.conflicts.length} courses`;
-                const tbody = document.getElementById('conflictsTableBody');
-                tbody.innerHTML = '';
-                if (data.conflicts.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color: var(--accent-emerald);">✓ Zero conflicts! No students share this course with any other course.</td></tr>';
-                } else {
-                    data.conflicts.forEach(cf => {
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td><span class="code-pill" onclick="inspectCourse('${cf.course_code}')">${cf.course_code}</span></td>
-                            <td>${cf.course_name}</td>
-                            <td><strong style="color: var(--accent-amber);">${cf.overlap_count}</strong> students</td>
-                            <td>
-                                <button class="btn btn-secondary" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;" onclick="showOverlapStudents('${cf.course_code}', ${JSON.stringify(cf.overlapping_students).replace(/"/g, '&quot;')})">
-                                    View Rolls
-                                </button>
-                            </td>
-                        `;
-                        tbody.appendChild(tr);
-                    });
-                }
-
-                // Render Safe Slots
-                const safeList = document.getElementById('safeSlotsList');
-                safeList.innerHTML = '';
-                if (data.safe_slots.safe_slots.length === 0) {
-                    safeList.innerHTML = '<div style="color: var(--accent-rose); font-size: 0.85rem;">No conflict-free slots available without moving other courses!</div>';
-                } else {
-                    data.safe_slots.safe_slots.forEach(s => {
-                        const item = document.createElement('div');
-                        item.style.padding = '0.6rem 0.85rem';
-                        item.style.borderRadius = '8px';
-                        item.style.background = 'rgba(16, 185, 129, 0.08)';
-                        item.style.border = '1px solid rgba(16, 185, 129, 0.25)';
-                        item.style.display = 'flex';
-                        item.style.justifyContent = 'space-between';
-                        item.style.alignItems = 'center';
-                        item.style.fontSize = '0.83rem';
-                        item.innerHTML = `
-                            <div>
-                                <strong style="color: #6ee7b7;">${s.date} ${s.session}</strong>
-                                <div style="color: var(--text-muted); font-size: 0.75rem;">${s.current_course_count} other courses</div>
-                            </div>
-                            <span class="stat-badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">Conflict Free</span>
-                        `;
-                        safeList.appendChild(item);
-                    });
-                }
-
-                // Reset simulator result
-                document.getElementById('simulateSlotSelect').value = '';
-                document.getElementById('simulationResult').innerHTML = '';
-
-            } catch (err) {
-                console.error(err);
+            // Current slot(s)
+            const currentSlots = courseToSlots[courseCode] || [];
+            const currentSlotEl = document.getElementById('cCurrentSlot');
+            if (currentSlots.length > 0) {
+                const slotBadges = currentSlots.map(s => {
+                    const chk = checkCourseInSlot(courseCode, s.id);
+                    return `<span class="code-pill ${chk.has_clash ? 'clash' : ''}" style="margin-left: 0.4rem;">
+                        ${s.full_name} ${chk.has_clash ? '⚠️ CLASH' : '✓'}
+                    </span>`;
+                }).join(' ');
+                currentSlotEl.innerHTML = `<strong>Scheduled in:</strong> ${slotBadges}`;
+            } else {
+                currentSlotEl.innerHTML = `<span style="color: var(--accent-rose);">⚠️ Currently Unscheduled in Timetable</span>`;
             }
+
+            // Conflicting courses
+            const rawConflicts = conflictGraph[courseCode] || {};
+            const conflictList = Object.entries(rawConflicts).map(([oc, stus]) => ({
+                course_code: oc,
+                course_name: DB.courses[oc]?.name || oc,
+                overlap_count: stus.length,
+                overlapping_students: stus
+            })).sort((a, b) => b.overlap_count - a.overlap_count);
+
+            document.getElementById('conflictCountBadge').textContent = `${conflictList.length} courses`;
+            const tbody = document.getElementById('conflictsTableBody');
+            tbody.innerHTML = '';
+            if (conflictList.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color: var(--accent-emerald);">✓ Zero conflicts! No students share this course with any other course.</td></tr>';
+            } else {
+                conflictList.forEach(cf => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><span class="code-pill" onclick="inspectCourse('${cf.course_code}')">${cf.course_code}</span></td>
+                        <td>${cf.course_name}</td>
+                        <td><strong style="color: var(--accent-amber);">${cf.overlap_count}</strong> students</td>
+                        <td>
+                            <button class="btn btn-secondary" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;" onclick="showOverlapStudents('${cf.course_code}', ${JSON.stringify(cf.overlapping_students).replace(/"/g, '&quot;')})">
+                                View Rolls
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            // Safe slots
+            const safeList = document.getElementById('safeSlotsList');
+            safeList.innerHTML = '';
+            const safeSlots = [];
+            timetableSlots.forEach(s => {
+                const chk = checkCourseInSlot(courseCode, s.id);
+                if (!chk.has_clash) safeSlots.push(s);
+            });
+
+            if (safeSlots.length === 0) {
+                safeList.innerHTML = '<div style="color: var(--accent-rose); font-size: 0.85rem;">No conflict-free slots available without moving other courses!</div>';
+            } else {
+                safeSlots.forEach(s => {
+                    const item = document.createElement('div');
+                    item.style.padding = '0.6rem 0.85rem';
+                    item.style.borderRadius = '8px';
+                    item.style.background = 'rgba(16, 185, 129, 0.08)';
+                    item.style.border = '1px solid rgba(16, 185, 129, 0.25)';
+                    item.style.display = 'flex';
+                    item.style.justifyContent = 'space-between';
+                    item.style.alignItems = 'center';
+                    item.style.fontSize = '0.83rem';
+                    item.innerHTML = `
+                        <div>
+                            <strong style="color: #6ee7b7;">${s.date} ${s.session}</strong>
+                            <div style="color: var(--text-muted); font-size: 0.75rem;">${s.courses.length} other courses</div>
+                        </div>
+                        <span class="stat-badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">Conflict Free</span>
+                    `;
+                    safeList.appendChild(item);
+                });
+            }
+
+            // Reset simulator result
+            document.getElementById('simulateSlotSelect').value = '';
+            document.getElementById('simulationResult').innerHTML = '';
         }
 
-        async function simulateSlotCheck() {
+        function simulateSlotCheck() {
             const courseCode = document.getElementById('courseSelect').value;
             const slotId = document.getElementById('simulateSlotSelect').value;
             const resArea = document.getElementById('simulationResult');
 
-            if (!slotId || !courseCode) {
+            if (!slotId || !courseCode || !DB) {
                 resArea.innerHTML = '';
                 return;
             }
 
-            try {
-                const res = await fetch(`/api/check-slot?course=${courseCode}&slot=${slotId}`).then(r => r.json());
-                if (!res.has_clash) {
-                    resArea.innerHTML = `
-                        <div class="clash-box success">
-                            <h5 style="color: #10b981; font-weight: 700;">✓ 100% Conflict-Free Slot!</h5>
-                            <p style="font-size: 0.82rem; color: #a7f3d0; margin-top: 0.25rem;">
-                                Course <strong>${courseCode}</strong> can be safely scheduled in <strong>${res.slot_name}</strong> without any student double-booking.
-                            </p>
-                        </div>
-                    `;
-                } else {
-                    const clashList = res.clashes.map(c => `
-                        <li style="margin-top: 0.35rem;">
-                            <strong>${c.clashing_course}</strong> (${c.course_name}): 
-                            <span style="color: #fca5a5; font-weight: 600;">${c.overlap_count} students</span>
-                        </li>
-                    `).join('');
+            const res = checkCourseInSlot(courseCode, slotId);
+            if (!res.has_clash) {
+                resArea.innerHTML = `
+                    <div class="clash-box success">
+                        <h5 style="color: #10b981; font-weight: 700;">✓ 100% Conflict-Free Slot!</h5>
+                        <p style="font-size: 0.82rem; color: #a7f3d0; margin-top: 0.25rem;">
+                            Course <strong>${courseCode}</strong> can be safely scheduled in <strong>${res.slot_name}</strong> without any student double-booking.
+                        </p>
+                    </div>
+                `;
+            } else {
+                const clashList = res.clashes.map(c => `
+                    <li style="margin-top: 0.35rem;">
+                        <strong>${c.clashing_course}</strong> (${c.course_name}): 
+                        <span style="color: #fca5a5; font-weight: 600;">${c.overlap_count} students</span>
+                    </li>
+                `).join('');
 
-                    resArea.innerHTML = `
-                        <div class="clash-box danger">
-                            <h5 style="color: #f43f5e; font-weight: 700;">❌ Hard Clash Detected (${res.total_affected_students} students affected)</h5>
-                            <p style="font-size: 0.82rem; color: #fecdd3; margin-top: 0.25rem;">
-                                Moving to <strong>${res.slot_name}</strong> causes direct clashes with:
-                            </p>
-                            <ul style="font-size: 0.8rem; margin-left: 1.25rem; color: var(--text-primary); margin-top: 0.4rem;">
-                                ${clashList}
-                            </ul>
-                        </div>
-                    `;
-                }
-            } catch (err) {
-                console.error(err);
+                resArea.innerHTML = `
+                    <div class="clash-box danger">
+                        <h5 style="color: #f43f5e; font-weight: 700;">❌ Hard Clash Detected (${res.total_affected} students affected)</h5>
+                        <p style="font-size: 0.82rem; color: #fecdd3; margin-top: 0.25rem;">
+                            Moving to <strong>${res.slot_name}</strong> causes direct clashes with:
+                        </p>
+                        <ul style="font-size: 0.8rem; margin-left: 1.25rem; color: var(--text-primary); margin-top: 0.4rem;">
+                            ${clashList}
+                        </ul>
+                    </div>
+                `;
             }
         }
 
@@ -1072,13 +1116,18 @@
             const grid = document.getElementById('timetableGrid');
             grid.innerHTML = '';
 
-            timetableData.forEach(slot => {
+            timetableSlots.forEach(slot => {
                 const card = document.createElement('div');
-                card.className = `slot-card ${slot.has_clash ? 'has-clash' : ''}`;
+                const slotClashes = auditClashes.filter(cl => cl.date === slot.date && cl.slot === slot.slot_name);
+                const hasClash = slotClashes.length > 0;
+                card.className = `slot-card ${hasClash ? 'has-clash' : ''}`;
                 
                 const sessionBadgeClass = slot.session.toLowerCase() === 'morning' ? 'badge-morning' : 'badge-evening';
+                const clashingCodes = new Set();
+                slotClashes.forEach(cl => { clashingCodes.add(cl.course_a); clashingCodes.add(cl.course_b); });
+
                 const tagCloud = slot.courses.map(c => {
-                    const isClashing = slot.clashing_courses && slot.clashing_courses.includes(c);
+                    const isClashing = clashingCodes.has(c);
                     return `<span class="code-pill ${isClashing ? 'clash' : ''}" onclick="inspectCourse('${c}')">${c}</span>`;
                 }).join(' ');
 
@@ -1090,7 +1139,7 @@
                         </div>
                         <span class="slot-badge ${sessionBadgeClass}">${slot.session}</span>
                     </div>
-                    ${slot.has_clash ? `<div style="color: #fb7185; font-size: 0.75rem; font-weight: 700; margin-bottom: 0.5rem;">⚠️ DIRECT CLASH IN THIS SLOT</div>` : ''}
+                    ${hasClash ? `<div style="color: #fb7185; font-size: 0.75rem; font-weight: 700; margin-bottom: 0.5rem;">⚠️ DIRECT CLASH IN THIS SLOT</div>` : ''}
                     <div class="course-tag-cloud">${tagCloud}</div>
                 `;
                 grid.appendChild(card);
@@ -1098,14 +1147,12 @@
         }
 
         function renderAuditReport() {
-            if (!summaryData) return;
-            // Clashes table
             const cBody = document.getElementById('auditClashesBody');
             cBody.innerHTML = '';
-            if (summaryData.clashes.length === 0) {
+            if (auditClashes.length === 0) {
                 cBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--accent-emerald);">✓ No direct clashes detected!</td></tr>';
             } else {
-                summaryData.clashes.forEach(cl => {
+                auditClashes.forEach(cl => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td><strong>${cl.date}</strong></td>
@@ -1121,10 +1168,9 @@
                 });
             }
 
-            // Duplicates table
             const dBody = document.getElementById('auditDuplicatesBody');
             dBody.innerHTML = '';
-            for (const [code, sls] of Object.entries(summaryData.duplicate_courses)) {
+            for (const [code, sls] of Object.entries(duplicateCourses)) {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td><span class="code-pill" onclick="inspectCourse('${code}')">${code}</span></td>
@@ -1134,54 +1180,70 @@
             }
         }
 
-        async function lookupStudent() {
+        function lookupStudent() {
             const roll = document.getElementById('studentRollInput').value.trim().toUpperCase();
-            if (!roll) return;
+            if (!roll || !DB) return;
 
-            try {
-                const data = await fetch(`/api/student/${roll}`).then(r => r.json());
-                const resArea = document.getElementById('studentResultArea');
-                resArea.style.display = 'block';
+            const resArea = document.getElementById('studentResultArea');
+            resArea.style.display = 'block';
 
-                if (data.error) {
-                    resArea.innerHTML = `<div class="clash-box danger">${data.error}</div>`;
-                    return;
-                }
-
-                document.getElementById('stuRollDisplay').textContent = `Student Roll: ${data.roll_number}`;
-                document.getElementById('stuEnrolledSummary').textContent = `Enrolled in ${data.total_enrolled} courses: ${data.enrolled_courses.join(', ')}`;
-
-                const badgeArea = document.getElementById('stuClashBadgeArea');
-                if (data.has_clashes) {
-                    badgeArea.innerHTML = `<span class="stat-badge badge-danger" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">❌ Double-Booked Exam Clash!</span>`;
-                } else {
-                    badgeArea.innerHTML = `<span class="stat-badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; font-size: 0.85rem; padding: 0.4rem 0.8rem;">✓ Clear (No Exam Clashes)</span>`;
-                }
-
-                const sBody = document.getElementById('studentScheduleBody');
-                sBody.innerHTML = '';
-                data.schedule.forEach(item => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td><span class="code-pill" onclick="inspectCourse('${item.course_code}')">${item.course_code}</span></td>
-                        <td>${item.course_name}</td>
-                        <td>${item.date || '-'}</td>
-                        <td>${item.session || '-'}</td>
-                        <td>
-                            <span class="stat-badge" style="${item.status === 'Scheduled' ? 'background: rgba(99,102,241,0.2); color:#a5b4fc;' : 'background: rgba(244,63,94,0.2); color:#fda4af;'}">
-                                ${item.status}
-                            </span>
-                        </td>
-                    `;
-                    sBody.appendChild(tr);
-                });
-
-            } catch (err) {
-                console.error(err);
+            const enrolled = DB.students[roll];
+            if (!enrolled) {
+                resArea.innerHTML = `<div class="clash-box danger">Student '${roll}' not found in registration data.</div>`;
+                return;
             }
+
+            const slotCounts = {};
+            const schedule = [];
+            enrolled.forEach(c => {
+                const sls = courseToSlots[c] || [];
+                const cName = DB.courses[c]?.name || c;
+                if (sls.length === 0) {
+                    schedule.push({ course_code: c, course_name: cName, date: '-', session: '-', status: 'Unscheduled' });
+                } else {
+                    sls.forEach(s => {
+                        schedule.push({ course_code: c, course_name: cName, date: s.date, session: s.session, status: 'Scheduled' });
+                        slotCounts[s.full_name] = (slotCounts[s.full_name] || []).concat(c);
+                    });
+                }
+            });
+
+            const studentClashes = [];
+            for (const [slotName, cs] of Object.entries(slotCounts)) {
+                if (cs.length > 1) {
+                    studentClashes.push({ slot: slotName, courses: cs, message: `Double-booked in ${slotName}: ${cs.join(', ')}` });
+                }
+            }
+
+            document.getElementById('stuRollDisplay').textContent = `Student Roll: ${roll}`;
+            document.getElementById('stuEnrolledSummary').textContent = `Enrolled in ${enrolled.length} courses: ${enrolled.join(', ')}`;
+
+            const badgeArea = document.getElementById('stuClashBadgeArea');
+            if (studentClashes.length > 0) {
+                badgeArea.innerHTML = `<span class="stat-badge badge-danger" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">❌ Double-Booked Exam Clash!</span>`;
+            } else {
+                badgeArea.innerHTML = `<span class="stat-badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; font-size: 0.85rem; padding: 0.4rem 0.8rem;">✓ Clear (No Exam Clashes)</span>`;
+            }
+
+            const sBody = document.getElementById('studentScheduleBody');
+            sBody.innerHTML = '';
+            schedule.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span class="code-pill" onclick="inspectCourse('${item.course_code}')">${item.course_code}</span></td>
+                    <td>${item.course_name}</td>
+                    <td>${item.date || '-'}</td>
+                    <td>${item.session || '-'}</td>
+                    <td>
+                        <span class="stat-badge" style="${item.status === 'Scheduled' ? 'background: rgba(99,102,241,0.2); color:#a5b4fc;' : 'background: rgba(244,63,94,0.2); color:#fda4af;'}">
+                            ${item.status}
+                        </span>
+                    </td>
+                `;
+                sBody.appendChild(tr);
+            });
         }
 
-        // Run on load
         window.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
