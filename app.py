@@ -1,22 +1,25 @@
 """
-Exam Clash Checker - Web Application & Local Server
-===================================================
-Launches a modern, responsive web dashboard on localhost.
-Runs using standard Python 3 libraries (no external server framework required).
+Exam Clash Checker - Web Application & Serverless Handler
+=========================================================
+Exports top-level "app", "application", and "handler" for Vercel deployment,
+while remaining runnable locally with "python app.py".
 """
 
 import os
 import sys
 import json
+import io
 import urllib.parse
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from exam_clash_checker import ExamClashChecker
 
-# Initialize global clash checker
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Initialize global clash checker instance
 CHECKER = ExamClashChecker()
 
 
-class ClashCheckerRequestHandler(BaseHTTPRequestHandler):
+class handler(BaseHTTPRequestHandler):
     def end_headers(self):
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "GET, OPTIONS")
@@ -32,12 +35,13 @@ class ClashCheckerRequestHandler(BaseHTTPRequestHandler):
         path = parsed.path
         query = urllib.parse.parse_qs(parsed.query)
 
-        # Static file: Main UI
+        # Static file: Main Web UI
         if path in ["/", "/index.html"]:
-            self.serve_static_file("web/index.html", "text/html; charset=utf-8")
+            html_file = os.path.join(BASE_DIR, "web", "index.html")
+            self.serve_static_file(html_file, "text/html; charset=utf-8")
             return
 
-        # API: Summary
+        # API: Summary and audit metrics
         if path == "/api/summary":
             audit = CHECKER.audit_timetable()
             data = {
@@ -63,7 +67,7 @@ class ClashCheckerRequestHandler(BaseHTTPRequestHandler):
             self.send_json(data)
             return
 
-        # API: All courses
+        # API: All courses list
         if path == "/api/courses":
             courses = []
             for code in sorted(CHECKER.course_to_students.keys()):
@@ -76,7 +80,7 @@ class ClashCheckerRequestHandler(BaseHTTPRequestHandler):
             self.send_json(courses)
             return
 
-        # API: Single course details
+        # API: Single course details & mutual exclusivity
         if path.startswith("/api/course/"):
             course_code = urllib.parse.unquote(path.split("/api/course/")[1]).strip().upper()
             if course_code not in CHECKER.course_to_students:
@@ -123,7 +127,7 @@ class ClashCheckerRequestHandler(BaseHTTPRequestHandler):
             self.send_json(res)
             return
 
-        # API: Timetable matrix
+        # API: Full timetable matrix
         if path == "/api/timetable":
             audit = CHECKER.audit_timetable()
             clash_course_set = set()
@@ -133,7 +137,6 @@ class ClashCheckerRequestHandler(BaseHTTPRequestHandler):
 
             slots_data = []
             for s in CHECKER.slots:
-                # check if slot has clashes
                 slot_clashes = [c for c in s["courses"] if c in clash_course_set]
                 slots_data.append({
                     "id": s["id"],
@@ -151,33 +154,34 @@ class ClashCheckerRequestHandler(BaseHTTPRequestHandler):
             self.send_json(slots_data)
             return
 
-        # API: Student schedule
+        # API: Student schedule lookup
         if path.startswith("/api/student/"):
             roll = urllib.parse.unquote(path.split("/api/student/")[1]).strip().upper()
             res = CHECKER.get_student_schedule(roll)
             self.send_json(res)
             return
 
-        # API: Export Excel
+        # API: In-memory Excel Export (compatible with Vercel serverless read-only filesystem)
         if path == "/api/export":
-            export_path = "Exam_Clash_Audit_Report.xlsx"
-            CHECKER.export_audit_to_excel(export_path)
-            if os.path.exists(export_path):
-                self.send_response(200)
-                self.send_header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-                self.send_header("Content-Disposition", f"attachment; filename={export_path}")
-                self.send_header("Content-Length", str(os.path.getsize(export_path)))
-                self.end_headers()
-                with open(export_path, "rb") as f:
-                    self.wfile.write(f.read())
-                return
+            buffer = io.BytesIO()
+            CHECKER.export_audit_to_excel(buffer)
+            buffer.seek(0)
+            excel_bytes = buffer.read()
 
-        # 404
+            self.send_response(200)
+            self.send_header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            self.send_header("Content-Disposition", "attachment; filename=Exam_Clash_Audit_Report.xlsx")
+            self.send_header("Content-Length", str(len(excel_bytes)))
+            self.end_headers()
+            self.wfile.write(excel_bytes)
+            return
+
+        # 404 handler
         self.send_json({"error": "Endpoint not found"}, status=404)
 
     def serve_static_file(self, filepath: str, content_type: str):
         if not os.path.exists(filepath):
-            self.send_json({"error": "File not found"}, status=404)
+            self.send_json({"error": "File not found", "path": filepath}, status=404)
             return
         with open(filepath, "rb") as f:
             content = f.read()
@@ -196,10 +200,16 @@ class ClashCheckerRequestHandler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
 
+# Export top-level variables expected by Vercel Python runtime
+app = handler
+application = handler
+ClashCheckerRequestHandler = handler
+
+
 def run_server(port: int = 8050):
     server_address = ("", port)
     try:
-        httpd = HTTPServer(server_address, ClashCheckerRequestHandler)
+        httpd = HTTPServer(server_address, handler)
         print(f"\n===========================================================")
         print(f"  Exam Clash Checker Dashboard is live!")
         print(f"  URL: http://localhost:{port}")

@@ -47,8 +47,9 @@ class TimetableAuditResult:
 
 class ExamClashChecker:
     def __init__(self, reg_data_path: str = None, timetable_path: str = None):
-        self.reg_data_path = reg_data_path or "Autumn 2026 Registration Data as on 31-8-2026.xlsx"
-        self.timetable_path = timetable_path or "Tentative TimeTable Autumn 2026 IITP v1.xlsx"
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        self.reg_data_path = reg_data_path or os.path.join(base_dir, "Autumn 2026 Registration Data as on 31-8-2026.xlsx")
+        self.timetable_path = timetable_path or os.path.join(base_dir, "Tentative TimeTable Autumn 2026 IITP v1.xlsx")
 
         self.student_to_courses = defaultdict(set)
         self.course_to_students = defaultdict(set)
