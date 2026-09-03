@@ -260,6 +260,34 @@ def handle_test_slot(checker: ExamClashChecker, course_code: str, slot_id: str):
             print(f"Source shift relief: {src['before']} -> {src['after']} ({src['diff']})")
 
 
+def handle_sync(checker: ExamClashChecker):
+    if USE_RICH:
+        console.print("[bold yellow]🔄 Fetching latest course slot data from live Google Sheet...[/bold yellow]")
+    else:
+        print("Fetching latest course slot data from live Google Sheet...")
+
+    success = checker.sync_live_google_sheet()
+    if success:
+        audit = checker.audit_timetable()
+        if USE_RICH:
+            console.print(Panel(
+                f"[bold green]✓ Successfully synced timetable slots from live Google Sheet![/bold green]\n\n"
+                f"[bold white]Google Sheet Link:[/bold white] [underline cyan]https://docs.google.com/spreadsheets/d/13nOOYTJxH2xPSadbZ6hFCNsQ_H_0J0oxJ4kRD7sdtec/edit?usp=sharing[/underline cyan]\n"
+                f"[bold white]Timetable Slots:[/bold white] {len(checker.slots)} examination shifts\n"
+                f"[bold white]Total Courses in Slots:[/bold white] {audit.total_courses_in_timetable}\n"
+                f"[bold white]Direct Clashes:[/bold white] " + (f"[bold red]{len(audit.clashes)}[/bold red]" if audit.clashes else "[bold green]0[/bold green]"),
+                title="Live Google Sheet Synchronized",
+                style="green"
+            ))
+        else:
+            print(f"Successfully synced {len(checker.slots)} slots from Google Sheet. Clashes: {len(audit.clashes)}")
+    else:
+        if USE_RICH:
+            console.print("[bold red]❌ Failed to sync from live Google Sheet. Preserving local timetable.[/bold red]")
+        else:
+            print("Failed to sync live Google Sheet.")
+
+
 def handle_student(checker: ExamClashChecker, roll_no: str):
     roll_no = roll_no.strip().upper()
     res = checker.get_student_schedule(roll_no)
@@ -328,6 +356,9 @@ def main():
     p_test.add_argument("course_code", help="Course code (e.g. HS4118)")
     p_test.add_argument("slot_id", help="Slot ID or name (e.g. slot_1)")
 
+    # sync
+    p_sync = subparsers.add_parser("sync", help="Fetch and synchronize latest slots directly from live Google Sheet")
+
     # student
     p_stu = subparsers.add_parser("student", help="View student's exam datesheet and clashes")
     p_stu.add_argument("roll_no", help="Student roll number (e.g. 2301MM04)")
@@ -341,7 +372,9 @@ def main():
 
     checker = ExamClashChecker()
 
-    if args.command == "audit":
+    if args.command == "sync":
+        handle_sync(checker)
+    elif args.command == "audit":
         handle_audit(checker, export=args.export)
     elif args.command == "check":
         handle_check(checker, args.course_code)

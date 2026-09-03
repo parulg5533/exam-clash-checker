@@ -482,6 +482,18 @@
                 </div>
             </div>
             <div class="header-actions">
+                <span id="liveSheetBadge" class="stat-badge" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); font-size: 0.8rem; padding: 0.45rem 0.8rem; display: flex; align-items: center; gap: 0.4rem;">
+                    <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></span>
+                    Live Google Sheet Connected
+                </span>
+                <button id="syncSheetBtn" class="btn btn-secondary" onclick="syncLiveGoogleSheet()" title="Re-fetch latest slot assignments from Google Sheet">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    Sync Live Sheet
+                </button>
+                <a href="https://docs.google.com/spreadsheets/d/13nOOYTJxH2xPSadbZ6hFCNsQ_H_0J0oxJ4kRD7sdtec/edit?usp=sharing" target="_blank" class="btn btn-secondary" title="Open Google Spreadsheet in new tab">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                    Live Sheet ↗
+                </a>
                 <a href="/Exam_Clash_Audit_Report.xlsx" class="btn btn-primary" download="Exam_Clash_Audit_Report.xlsx">
                     <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                     Export Excel Report
@@ -763,6 +775,133 @@
         let auditClashes = [];
         let duplicateCourses = {};
 
+        const GOOGLE_SHEET_ID = "13nOOYTJxH2xPSadbZ6hFCNsQ_H_0J0oxJ4kRD7sdtec";
+        const GOOGLE_SHEET_GVIZ_URL = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?sheet=Timetable`;
+
+        function parseGoogleVisualizationRows(rows) {
+            const slots = [];
+            let slotIdx = 0;
+
+            function parseCourses(cellVal) {
+                if (!cellVal) return [];
+                return String(cellVal).split(/[,/]/).map(s => s.trim()).filter(s => s && s !== '`');
+            }
+
+            rows.forEach(r => {
+                if (!r.c || !r.c[0]) return;
+                const rawFmt = r.c[0].f;
+                const rawVal = r.c[0].v;
+                
+                let dateStr = rawFmt || rawVal;
+                if (!dateStr || dateStr === 'null') return;
+
+                if (typeof dateStr === 'string' && dateStr.includes('Date(')) {
+                    const m = dateStr.match(/Date\((\d+),(\d+),(\d+)\)/);
+                    if (m) {
+                        const y = m[1], mo = String(Number(m[2]) + 1).padStart(2, '0'), d = String(m[3]).padStart(2, '0');
+                        dateStr = `${y}-${mo}-${d}`;
+                    }
+                } else if (typeof dateStr === 'string') {
+                    const m = dateStr.match(/(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})/);
+                    if (m) {
+                        const months = { January:'01', February:'02', March:'03', April:'04', May:'05', June:'06', July:'07', August:'08', September:'09', October:'10', November:'11', December:'12' };
+                        const day = String(m[1]).padStart(2, '0');
+                        const mo = months[m[2]] || '09';
+                        const yr = m[3];
+                        dateStr = `${yr}-${mo}-${day}`;
+                    }
+                }
+
+                const mRaw = r.c[1] ? r.c[1].v : null;
+                const eRaw = r.c[2] ? r.c[2].v : null;
+
+                const mCourses = parseCourses(mRaw);
+                const eCourses = parseCourses(eRaw);
+
+                if (mCourses.length > 0) {
+                    slots.push({
+                        id: `slot_${slotIdx++}`,
+                        date: dateStr,
+                        session: 'Morning',
+                        slot_name: 'Morning (10:30 am - 12:30 pm)',
+                        full_name: `${dateStr} Morning (10:30 am - 12:30 pm)`,
+                        courses: mCourses
+                    });
+                }
+                if (eCourses.length > 0) {
+                    slots.push({
+                        id: `slot_${slotIdx++}`,
+                        date: dateStr,
+                        session: 'Evening',
+                        slot_name: 'Evening (3:30 pm - 5:30 pm)',
+                        full_name: `${dateStr} Evening (3:30 pm - 5:30 pm)`,
+                        courses: eCourses
+                    });
+                }
+            });
+
+            return slots;
+        }
+
+        function syncLiveGoogleSheet() {
+            const btn = document.getElementById('syncSheetBtn');
+            const badge = document.getElementById('liveSheetBadge');
+            if (btn) btn.innerHTML = '🔄 Syncing...';
+
+            window.google = window.google || {};
+            window.google.visualization = window.google.visualization || {};
+            window.google.visualization.Query = {
+                setResponse: function(res) {
+                    try {
+                        const liveSlots = parseGoogleVisualizationRows(res.table.rows);
+                        if (liveSlots && liveSlots.length > 0) {
+                            timetableSlots = liveSlots;
+                            if (DB) {
+                                DB.slots = liveSlots;
+                                buildEngine(DB);
+                            }
+                            if (badge) {
+                                badge.innerHTML = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#10b981;"></span> Live Google Sheet Connected`;
+                                badge.style.background = 'rgba(16, 185, 129, 0.15)';
+                                badge.style.color = '#34d399';
+                                badge.title = 'Synchronized with Google Sheet at ' + new Date().toLocaleTimeString();
+                            }
+                            if (btn) {
+                                btn.innerHTML = '✓ Synced!';
+                                setTimeout(() => { btn.innerHTML = '<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Sync Live Sheet'; }, 2000);
+                            }
+                        }
+                    } catch (err) {
+                        console.error("Error applying live Google Sheet data:", err);
+                        if (btn) btn.innerHTML = '⚠️ Sync Failed';
+                    }
+                }
+            };
+
+            const script = document.createElement('script');
+            script.src = `${GOOGLE_SHEET_GVIZ_URL}&t=${Date.now()}`;
+            script.onerror = function() {
+                console.warn("Could not load Google Sheets JSONP directly; trying backend /api/sync-google-sheet...");
+                fetch('/api/sync-google-sheet')
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.slots && data.slots.length > 0) {
+                            timetableSlots = data.slots;
+                            if (DB) {
+                                DB.slots = data.slots;
+                                buildEngine(DB);
+                            }
+                            if (btn) btn.innerHTML = '✓ Synced!';
+                        }
+                    })
+                    .catch(e => {
+                        console.warn("Backend sync notice:", e);
+                        if (btn) btn.innerHTML = '🔄 Sync Live Sheet';
+                    });
+            };
+            document.body.appendChild(script);
+        }
+
         // 1. Initialize
         async function init() {
             // Instantly render dropdown from 266 courses
@@ -773,6 +912,7 @@
                 const res = await fetch('/data.json');
                 if (res.ok) {
                     DB = await res.json();
+                    buildEngine(DB);
                 } else {
                     console.warn("Could not load /data.json via HTTP, checking alternative source...");
                 }
@@ -780,9 +920,8 @@
                 console.warn("Fetch error:", err);
             }
 
-            if (DB) {
-                buildEngine(DB);
-            }
+            // Immediately sync with the live Google Sheet!
+            syncLiveGoogleSheet();
         }
 
         // 2. Client-Side High-Performance Graph & Audit Engine

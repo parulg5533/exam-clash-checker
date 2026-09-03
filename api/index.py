@@ -47,6 +47,21 @@ class handler(BaseHTTPRequestHandler):
         else:
             path = parsed.path
 
+        # 0. API: Sync with live Google Sheet
+        if path in ("/api/sync-google-sheet", "/api/live-timetable"):
+            success = CHECKER.sync_live_google_sheet()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps({
+                "success": success,
+                "slots_count": len(CHECKER.slots),
+                "slots": CHECKER.slots,
+                "source": "live_google_sheet",
+                "sheet_url": "https://docs.google.com/spreadsheets/d/13nOOYTJxH2xPSadbZ6hFCNsQ_H_0J0oxJ4kRD7sdtec/edit?usp=sharing"
+            }).encode("utf-8"))
+            return
+
         # 1. API: Summary and audit metrics
         if path == "/api/summary":
             audit = CHECKER.audit_timetable()

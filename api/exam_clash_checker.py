@@ -45,6 +45,11 @@ class TimetableAuditResult:
     students_with_clashes: dict  # student -> list of clashed slots
 
 
+LIVE_GOOGLE_SHEET_ID = "13nOOYTJxH2xPSadbZ6hFCNsQ_H_0J0oxJ4kRD7sdtec"
+LIVE_GOOGLE_SHEET_EXPORT_URL = "https://docs.google.com/spreadsheets/d/13nOOYTJxH2xPSadbZ6hFCNsQ_H_0J0oxJ4kRD7sdtec/export?format=xlsx"
+LIVE_GOOGLE_SHEET_VIEW_URL = "https://docs.google.com/spreadsheets/d/13nOOYTJxH2xPSadbZ6hFCNsQ_H_0J0oxJ4kRD7sdtec/edit?usp=sharing"
+
+
 class ExamClashChecker:
     def __init__(self, reg_data_path: str = None, timetable_path: str = None):
         base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -148,63 +153,106 @@ class ExamClashChecker:
                     self.conflict_graph[c1][c2] = overlap
                     self.conflict_graph[c2][c1] = overlap
 
-    def load_timetable(self, timetable_path: str):
-        """Loads and parses the timetable Excel file."""
-        self.timetable_path = timetable_path
+
+
+    def load_timetable(self, timetable_path: str = None):
+        """Loads and parses the timetable from the live Google Sheet or local file."""
+        if timetable_path is None or str(timetable_path).startswith("http"):
+            url = timetable_path or LIVE_GOOGLE_SHEET_EXPORT_URL
+            try:
+                import urllib.request, io
+                req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+                with urllib.request.urlopen(req, timeout=12) as resp:
+                    wb = openpyxl.load_workbook(io.BytesIO(resp.read()), data_only=True)
+                    self._parse_timetable_workbook(wb)
+                    self.timetable_source = "live_google_sheet"
+                    return
+            except Exception as e:
+                print(f"[Notice] Could not load live Google Sheet ({e}), falling back to local file.")
+
+        local_path = timetable_path if (timetable_path and not str(timetable_path).startswith("http")) else self.timetable_path
+        if os.path.exists(local_path):
+            wb = openpyxl.load_workbook(local_path, data_only=True)
+            self._parse_timetable_workbook(wb)
+            self.timetable_source = "local_excel"
+
+    def sync_live_google_sheet(self) -> bool:
+        """Explicitly re-fetches the timetable from the live Google Sheet."""
+        try:
+            import urllib.request, io
+            req = urllib.request.Request(LIVE_GOOGLE_SHEET_EXPORT_URL, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req, timeout=12) as resp:
+                wb = openpyxl.load_workbook(io.BytesIO(resp.read()), data_only=True)
+                self._parse_timetable_workbook(wb)
+                self.timetable_source = "live_google_sheet"
+                return True
+        except Exception as e:
+            print(f"[Error] Failed to sync live Google Sheet: {e}")
+            return False
+
+    def _parse_timetable_workbook(self, wb):
+        ws = wb["Timetable"] if "Timetable" in wb.sheetnames else wb.active
         self.slots.clear()
         self.course_to_slots.clear()
-
-        wb = openpyxl.load_workbook(timetable_path, data_only=True)
-        ws = wb["Timetable"] if "Timetable" in wb.sheetnames else wb.active
 
         slot_index = 0
         for row in list(ws.iter_rows(values_only=True))[1:]:
             date_val = row[0]
-            if not date_val or str(date_val).strip() == "None":
+            if not date_val or str(date_val).strip() in ["None", "`", ""]:
                 continue
             
             if hasattr(date_val, "strftime"):
                 date_str = date_val.strftime("%Y-%m-%d")
             else:
-                date_str = str(date_val).strip().split(" ")[0]
+                val_str = str(date_val).strip()
+                import re
+                dm = re.search(r'(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})', val_str)
+                if dm:
+                    from datetime import datetime
+                    dt = datetime.strptime(f"{dm.group(1)} {dm.group(2)} {dm.group(3)}", "%d %B %Y")
+                    date_str = dt.strftime("%Y-%m-%d")
+                else:
+                    date_str = val_str.split(" ")[0]
 
             # Morning slot
-            morning_raw = row[1]
+            morning_raw = row[1] if len(row) > 1 else None
             if morning_raw and str(morning_raw).strip() not in ["None", "`", ""]:
                 m_courses = self._parse_course_list(str(morning_raw))
-                slot_id = f"slot_{slot_index}"
-                slot_name = "Morning (10:30 am - 12:30 pm)"
-                slot_dict = {
-                    "id": slot_id,
-                    "date": date_str,
-                    "session": "Morning",
-                    "slot_name": slot_name,
-                    "full_name": f"{date_str} {slot_name}",
-                    "courses": m_courses,
-                }
-                self.slots.append(slot_dict)
-                for c in m_courses:
-                    self.course_to_slots[c].append(slot_dict)
-                slot_index += 1
+                if m_courses:
+                    slot_id = f"slot_{slot_index}"
+                    slot_name = "Morning (10:30 am - 12:30 pm)"
+                    slot_dict = {
+                        "id": slot_id,
+                        "date": date_str,
+                        "session": "Morning",
+                        "slot_name": slot_name,
+                        "full_name": f"{date_str} {slot_name}",
+                        "courses": m_courses,
+                    }
+                    self.slots.append(slot_dict)
+                    for c in m_courses:
+                        self.course_to_slots[c].append(slot_dict)
+                    slot_index += 1
 
             # Evening slot
             evening_raw = row[2] if len(row) > 2 else None
             if evening_raw and str(evening_raw).strip() not in ["None", "`", ""]:
                 e_courses = self._parse_course_list(str(evening_raw))
-                slot_id = f"slot_{slot_index}"
-                slot_name = "Evening (3:30 pm - 5:30 pm)"
-                slot_dict = {
-                    "id": slot_id,
-                    "date": date_str,
-                    "session": "Evening",
-                    "slot_name": slot_name,
-                    "full_name": f"{date_str} {slot_name}",
-                    "courses": e_courses,
-                }
-                self.slots.append(slot_dict)
-                for c in e_courses:
-                    self.course_to_slots[c].append(slot_dict)
-                slot_index += 1
+                if e_courses:
+                    slot_id = f"slot_{slot_index}"
+                    slot_name = "Evening (3:30 pm - 5:30 pm)"
+                    slot_dict = {
+                        "id": slot_id,
+                        "date": date_str,
+                        "session": "Evening",
+                        "slot_name": slot_name,
+                        "full_name": f"{date_str} {slot_name}",
+                        "courses": e_courses,
+                    }
+                    self.slots.append(slot_dict)
+                    for c in e_courses:
+                        self.course_to_slots[c].append(slot_dict)
+                    slot_index += 1
 
     @staticmethod
     def _parse_course_list(cell_text: str) -> list:
