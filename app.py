@@ -32,13 +32,27 @@ class handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
-        path = parsed.path
         query = urllib.parse.parse_qs(parsed.query)
 
-        # Static file: Main Web UI
-        if path in ["/", "/index.html"]:
-            html_file = os.path.join(BASE_DIR, "web", "index.html")
-            self.serve_static_file(html_file, "text/html; charset=utf-8")
+        # Robust path resolution across Vercel serverless rewrites and local HTTP server
+        path = (
+            query.get("path", [""])[0]
+            or self.headers.get("x-forwarded-uri", "").split("?")[0]
+            or self.headers.get("x-matched-path", "").split("?")[0]
+            or parsed.path
+        ).strip()
+
+        # Static file: Main Web UI (Root, index.html, or Vercel default function paths)
+        if path in ["", "/", "/index.html", "/app", "/app.py", "/web", "/web/index.html"]:
+            html_candidates = [
+                os.path.join(BASE_DIR, "public", "index.html"),
+                os.path.join(BASE_DIR, "web", "index.html"),
+            ]
+            for html_file in html_candidates:
+                if os.path.exists(html_file):
+                    self.serve_static_file(html_file, "text/html; charset=utf-8")
+                    return
+            self.send_json({"error": "UI index.html not found on server"}, status=500)
             return
 
         # API: Summary and audit metrics
@@ -117,7 +131,7 @@ class handler(BaseHTTPRequestHandler):
             return
 
         # API: Check slot simulation
-        if path == "/api/check-slot":
+        if path.startswith("/api/check-slot"):
             course = query.get("course", [""])[0].strip().upper()
             slot_id = query.get("slot", [""])[0].strip()
             if not course or not slot_id:
@@ -176,8 +190,8 @@ class handler(BaseHTTPRequestHandler):
             self.wfile.write(excel_bytes)
             return
 
-        # 404 handler
-        self.send_json({"error": "Endpoint not found"}, status=404)
+        # 404 handler with diagnostic path info
+        self.send_json({"error": "Endpoint not found", "requested_path": path}, status=404)
 
     def serve_static_file(self, filepath: str, content_type: str):
         if not os.path.exists(filepath):
