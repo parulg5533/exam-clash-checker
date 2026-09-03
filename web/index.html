@@ -90,6 +90,7 @@
             letter-spacing: -0.02em;
             background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
@@ -467,6 +468,42 @@
             margin: 0.15rem;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
+
+        .code-pill.moved {
+            background: rgba(16, 185, 129, 0.2);
+            color: #6ee7b7;
+            border-color: rgba(16, 185, 129, 0.6);
+            font-weight: 700;
+        }
+
+        .slot-card.has-moved {
+            border-color: rgba(16, 185, 129, 0.5);
+            background: linear-gradient(180deg, rgba(16, 185, 129, 0.06) 0%, rgba(17, 24, 39, 0.7) 100%);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #1e293b;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--accent-emerald);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.88rem;
+            animation: slideUp 0.25s ease-out;
+            max-width: 420px;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -536,6 +573,11 @@
             <button class="tab-btn" onclick="switchTab('timetable')">
                 <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                 Timetable Grid View
+            </button>
+            <button class="tab-btn" onclick="switchTab('draft')">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                Draft Timetable Builder
+                <span id="navDraftBadge" class="stat-badge" style="background: rgba(16, 185, 129, 0.25); color: #34d399; font-size: 0.72rem; padding: 0.15rem 0.45rem; display: none;">0 Moves</span>
             </button>
             <button class="tab-btn" onclick="switchTab('audit')">
                 <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
@@ -659,7 +701,132 @@
             </div>
         </div>
 
-        <!-- TAB 3: Full Audit & Clashes Report -->
+        <!-- TAB: Draft Timetable Builder & Scenario Planner -->
+        <div id="tab-draft" class="tab-content">
+            <!-- Draft Header & Action Controls -->
+            <div class="card" style="border-left: 4px solid var(--accent-emerald);">
+                <div class="card-header" style="margin-bottom: 0.75rem;">
+                    <div>
+                        <div class="card-title" style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                            <span>🛠️ Interactive Draft Timetable & What-If Planner</span>
+                            <span id="draftStatusBadge" class="stat-badge" style="background: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 0.8rem; padding: 0.35rem 0.75rem;">0 Courses Moved (Clean Draft)</span>
+                        </div>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.35rem;">
+                            Freely reassign courses across slots to eliminate clashes and optimize student load. All changes and headcounts are tracked in real-time.
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+                        <button class="btn btn-secondary" onclick="undoLastDraftMove()" id="btnUndoDraft" style="font-size: 0.82rem;" title="Undo previous move">
+                            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 10h10a5 5 0 015 5v2M3 10l6-6M3 10l6 6"></path></svg>
+                            Undo Move
+                        </button>
+                        <button class="btn btn-secondary" onclick="resetDraftTimetable()" style="font-size: 0.82rem; border-color: rgba(244,63,94,0.3); color: #fda4af;" title="Reset all changes back to original timetable">
+                            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            Reset Draft
+                        </button>
+                        <button class="btn btn-primary" onclick="exportDraftExcel()" id="btnExportDraft" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 14px rgba(16,185,129,0.35);">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            Export Color-Coded Draft (.xlsx)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Draft Metrics Row -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.85rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                    <div style="background: rgba(255,255,255,0.02); padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid var(--border-color);">
+                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Draft Clashes</div>
+                        <div id="draftClashCountDisplay" style="font-size: 1.4rem; font-weight: 800; color: #34d399; margin-top: 0.2rem;">0 Clashes</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.02); padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid var(--border-color);">
+                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Courses Reassigned</div>
+                        <div id="draftMovedCountDisplay" style="font-size: 1.4rem; font-weight: 800; color: #67e8f9; margin-top: 0.2rem;">0</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.02); padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid var(--border-color);">
+                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Total Exam Slots</div>
+                        <div id="draftSlotsCountDisplay" style="font-size: 1.4rem; font-weight: 800; color: #ffffff; margin-top: 0.2rem;">18</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.02); padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid var(--border-color);">
+                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Draft Export Format</div>
+                        <div style="font-size: 0.95rem; font-weight: 700; color: #cbd5e1; margin-top: 0.4rem;">Color-Coded 4-Sheet Excel</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Course Reassigner Bar -->
+            <div class="card">
+                <div class="card-title" style="margin-bottom: 1rem; font-size: 1.05rem;">
+                    <span>⚡ Reassign Any Course to Another Slot</span>
+                </div>
+                <div style="display: grid; grid-template-columns: 1.2fr 1.5fr auto; gap: 1rem; align-items: flex-end;">
+                    <div>
+                        <label style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">1. Select Course:</label>
+                        <select id="draftCourseSelect" class="select-styled" onchange="onDraftCourseSelected()" style="margin-top: 0.35rem;">
+                            <option value="">-- Choose Course to Move --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">2. Destination Slot:</label>
+                        <select id="draftTargetSlotSelect" class="select-styled" onchange="onDraftTargetSlotChange()" style="margin-top: 0.35rem;">
+                            <option value="">-- Choose Target Exam Slot --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary" onclick="applyDraftMove()" id="btnApplyDraftMove" style="height: 44px; padding: 0 1.4rem; white-space: nowrap;">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+                            Apply Move to Draft
+                        </button>
+                    </div>
+                </div>
+                <div id="draftMovePreviewBox" style="margin-top: 0.85rem; display: none;"></div>
+            </div>
+
+            <!-- Draft Move History & Changelog -->
+            <div class="card" id="draftChangelogCard">
+                <div class="card-header">
+                    <div class="card-title" style="font-size: 1.05rem;">
+                        <span>📋 Draft Changes Audit & Changelog</span>
+                        <span id="draftChangelogBadge" class="stat-badge" style="background: rgba(99,102,241,0.15); color: #a5b4fc;">0 moves</span>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Course Code</th>
+                                <th>Course Name</th>
+                                <th>Enrolled</th>
+                                <th>Original Slot</th>
+                                <th>Draft Slot</th>
+                                <th>Draft Slot Headcount</th>
+                                <th>Clash Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="draftChangelogBody">
+                            <tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 1.25rem;">Original schedule active. Pick any course above or click "Move to Draft" in the Course Inspector.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Draft Timetable Grid -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title" style="font-size: 1.05rem;">
+                        <span>🗓️ Full Draft Timetable Grid View</span>
+                    </div>
+                    <div style="font-size: 0.82rem; color: var(--text-secondary); display: flex; align-items: center; gap: 1rem;">
+                        <span style="display: inline-flex; align-items: center; gap: 0.35rem;"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:rgba(16,185,129,0.3);border:1px solid #10b981;"></span> Reassigned Course</span>
+                        <span style="display: inline-flex; align-items: center; gap: 0.35rem;"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:rgba(244,63,94,0.3);border:1px solid #f43f5e;"></span> Clashing Course</span>
+                    </div>
+                </div>
+                <div class="timetable-grid" id="draftTimetableGrid">
+                    <!-- Dynamic Draft Slots Cards -->
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: Full Audit & Clashes Report -->
         <div id="tab-audit" class="tab-content">
             <div class="card">
                 <div class="card-header">
@@ -1004,6 +1171,7 @@
             populateSimulatorSlots();
             renderTimetableGrid();
             renderAuditReport();
+            initDraftEngine();
 
             // Select default course
             const urlParams = new URLSearchParams(window.location.search);
@@ -1021,6 +1189,11 @@
 
             const content = document.getElementById(`tab-${tabId}`);
             if (content) content.classList.add('active');
+
+            if (tabId === 'draft') {
+                renderDraftUI();
+                populateDraftDropdowns();
+            }
         }
 
         function renderStats() {
@@ -1208,7 +1381,12 @@
                                 ${s.courses.length} courses &bull; Headcount: <strong>${beforeCount.toLocaleString()}</strong> &rarr; <strong style="color:#67e8f9">${afterCount.toLocaleString()}</strong> (+${diff})
                             </div>
                         </div>
-                        <span class="stat-badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">Conflict Free</span>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="stat-badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">Conflict Free</span>
+                            <button class="btn btn-secondary" style="padding: 0.3rem 0.65rem; font-size: 0.75rem; border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7;" onclick="moveCourseToDraftSlot('${courseCode}', '${s.id}', { switchTab: true })">
+                                + Move to Draft
+                            </button>
+                        </div>
                     `;
                     safeList.appendChild(item);
                 });
@@ -1348,7 +1526,14 @@
                 `;
             }
 
-            resArea.innerHTML = statusHtml + counterHtml;
+            const applyMoveBtnHtml = `
+                <div style="margin-top: 0.85rem; display: flex; justify-content: flex-end;">
+                    <button class="btn btn-primary" style="background: ${res.has_clash ? '#f59e0b' : '#10b981'}; border-color: ${res.has_clash ? '#f59e0b' : '#10b981'}; font-size: 0.82rem; padding: 0.55rem 1.1rem;" onclick="moveCourseToDraftSlot('${courseCode}', '${slotId}', { switchTab: true })">
+                        ${res.has_clash ? '⚠️ Move to Draft Slot (Contains Clashes)' : '✓ Apply this Move to Draft Timetable'}
+                    </button>
+                </div>
+            `;
+            resArea.innerHTML = statusHtml + counterHtml + applyMoveBtnHtml;
         }
 
         function inspectCourse(code) {
@@ -1495,6 +1680,549 @@
                 `;
                 sBody.appendChild(tr);
             });
+        }
+
+        // -------------------------------------------------------------
+        // DRAFT TIMETABLE ENGINE & STATE
+        // -------------------------------------------------------------
+        let draftSlots = [];
+        let draftMoves = [];
+        let draftHistory = [];
+        let draftClashes = [];
+
+        function initDraftEngine() {
+            if (!timetableSlots || timetableSlots.length === 0) return;
+            draftSlots = timetableSlots.map(s => ({
+                id: s.id,
+                date: s.date,
+                session: s.session,
+                slot_name: s.slot_name,
+                full_name: s.full_name,
+                courses: [...s.courses]
+            }));
+            draftMoves = [];
+            draftHistory = [];
+            recalculateDraftAudit();
+            renderDraftUI();
+            populateDraftDropdowns();
+        }
+
+        function getDraftSlotHeadcount(slot) {
+            if (!slot || !DB) return 0;
+            const stus = new Set();
+            (slot.courses || []).forEach(c => {
+                (DB.courses[c]?.students || []).forEach(st => stus.add(st));
+            });
+            return stus.size;
+        }
+
+        function getOriginalSlotHeadcountByDateSession(date, session) {
+            if (!timetableSlots || !DB) return 0;
+            const orig = timetableSlots.find(s => s.date === date && s.session === session);
+            return getSlotHeadcount(orig);
+        }
+
+        function recalculateDraftAudit() {
+            if (!draftSlots || !conflictGraph) return;
+            draftClashes = [];
+            draftSlots.forEach(s => {
+                for (let i = 0; i < s.courses.length; i++) {
+                    const c1 = s.courses[i];
+                    for (let j = i + 1; j < s.courses.length; j++) {
+                        const c2 = s.courses[j];
+                        const overlap = conflictGraph[c1]?.[c2];
+                        if (overlap && overlap.length > 0) {
+                            draftClashes.push({
+                                date: s.date,
+                                slot: s.slot_name,
+                                slot_id: s.id,
+                                course_a: c1,
+                                course_b: c2,
+                                overlap_count: overlap.length,
+                                students: overlap
+                            });
+                        }
+                    }
+                }
+            });
+        }
+
+        function populateDraftDropdowns() {
+            const cSelect = document.getElementById('draftCourseSelect');
+            if (!cSelect) return;
+            const currentVal = cSelect.value;
+            cSelect.innerHTML = '<option value="">-- Choose Course to Move --</option>';
+
+            allCourses.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.code;
+                const curSlot = draftSlots.find(s => s.courses.includes(c.code));
+                const slotTxt = curSlot ? `${curSlot.date} ${curSlot.session}` : 'Unscheduled';
+                opt.textContent = `${c.code} - ${c.name} [Now: ${slotTxt}]`;
+                cSelect.appendChild(opt);
+            });
+
+            if (currentVal) cSelect.value = currentVal;
+            onDraftCourseSelected();
+        }
+
+        function onDraftCourseSelected() {
+            const courseCode = document.getElementById('draftCourseSelect')?.value;
+            const sSelect = document.getElementById('draftTargetSlotSelect');
+            const previewBox = document.getElementById('draftMovePreviewBox');
+            if (!sSelect) return;
+
+            sSelect.innerHTML = '<option value="">-- Choose Target Exam Slot --</option>';
+            if (!courseCode || !DB) {
+                if (previewBox) previewBox.style.display = 'none';
+                return;
+            }
+
+            const currentSlot = draftSlots.find(s => s.courses.includes(courseCode));
+
+            draftSlots.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.id;
+                const isCurrent = currentSlot && currentSlot.id === s.id;
+
+                const clashes = [];
+                s.courses.forEach(c => {
+                    if (c !== courseCode) {
+                        const overlap = conflictGraph[courseCode]?.[c];
+                        if (overlap && overlap.length > 0) {
+                            clashes.push(c);
+                        }
+                    }
+                });
+
+                const curHeadcount = getDraftSlotHeadcount(s);
+                const projStus = new Set();
+                s.courses.forEach(c => (DB.courses[c]?.students || []).forEach(st => projStus.add(st)));
+                (DB.courses[courseCode]?.students || []).forEach(st => projStus.add(st));
+                const projHeadcount = projStus.size;
+
+                const statusTag = clashes.length > 0 ? `⚠️ ${clashes.length} Clash` : '✓ Safe';
+                const currentTag = isCurrent ? ' (Current)' : '';
+
+                opt.textContent = `${s.date} ${s.session} • Headcount: ${curHeadcount} → ${projHeadcount} [${statusTag}]${currentTag}`;
+                if (isCurrent) opt.disabled = true;
+                sSelect.appendChild(opt);
+            });
+
+            onDraftTargetSlotChange();
+        }
+
+        function onDraftTargetSlotChange() {
+            const courseCode = document.getElementById('draftCourseSelect')?.value;
+            const targetSlotId = document.getElementById('draftTargetSlotSelect')?.value;
+            const previewBox = document.getElementById('draftMovePreviewBox');
+            if (!previewBox) return;
+
+            if (!courseCode || !targetSlotId || !DB) {
+                previewBox.style.display = 'none';
+                return;
+            }
+
+            const targetSlot = draftSlots.find(s => s.id === targetSlotId);
+            if (!targetSlot) {
+                previewBox.style.display = 'none';
+                return;
+            }
+
+            const currentSlot = draftSlots.find(s => s.courses.includes(courseCode));
+
+            const clashes = [];
+            targetSlot.courses.forEach(c => {
+                if (c !== courseCode) {
+                    const overlap = conflictGraph[courseCode]?.[c];
+                    if (overlap && overlap.length > 0) {
+                        clashes.push({ code: c, count: overlap.length });
+                    }
+                }
+            });
+
+            const targetBefore = getDraftSlotHeadcount(targetSlot);
+            const afterSet = new Set();
+            targetSlot.courses.forEach(c => (DB.courses[c]?.students || []).forEach(st => afterSet.add(st)));
+            (DB.courses[courseCode]?.students || []).forEach(st => afterSet.add(st));
+            const targetAfter = afterSet.size;
+            const targetDiff = targetAfter - targetBefore;
+
+            previewBox.style.display = 'block';
+            previewBox.innerHTML = `
+                <div class="clash-box ${clashes.length > 0 ? 'danger' : 'success'}" style="margin-top: 0; padding: 0.85rem 1.1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                        <div>
+                            <strong>${courseCode}</strong> &rarr; <strong>${targetSlot.date} ${targetSlot.session}</strong>
+                            <div style="font-size: 0.8rem; margin-top: 0.2rem;">
+                                From: <strong>${currentSlot ? currentSlot.full_name : 'Unscheduled'}</strong> | Target Headcount: <strong>${targetBefore} &rarr; ${targetAfter} (+${targetDiff})</strong>
+                            </div>
+                        </div>
+                        <div>
+                            ${clashes.length > 0
+                                ? `<span class="stat-badge badge-danger">❌ Clashes with: ${clashes.map(c => c.code).join(', ')}</span>`
+                                : `<span class="stat-badge" style="background: rgba(16,185,129,0.2); color: #34d399;">✓ 100% Conflict-Free Move</span>`
+                            }
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function applyDraftMove() {
+            const courseCode = document.getElementById('draftCourseSelect')?.value;
+            const targetSlotId = document.getElementById('draftTargetSlotSelect')?.value;
+            if (!courseCode) {
+                showToast("Please select a course to move", "warning");
+                return;
+            }
+            if (!targetSlotId) {
+                showToast("Please select a destination exam slot", "warning");
+                return;
+            }
+            moveCourseToDraftSlot(courseCode, targetSlotId);
+        }
+
+        function moveCourseToDraftSlot(courseCode, targetSlotId, options = {}) {
+            if (!courseCode || !targetSlotId || !draftSlots.length) return;
+
+            const targetSlot = draftSlots.find(s => s.id === targetSlotId);
+            if (!targetSlot) return;
+
+            let fromSlot = null;
+            for (const s of draftSlots) {
+                if (s.courses.includes(courseCode)) {
+                    fromSlot = s;
+                    break;
+                }
+            }
+
+            if (fromSlot && fromSlot.id === targetSlotId) {
+                showToast(`${courseCode} is already in this slot`, "warning");
+                return;
+            }
+
+            draftHistory.push({
+                draftSlots: draftSlots.map(s => ({ ...s, courses: [...s.courses] })),
+                draftMoves: [...draftMoves]
+            });
+
+            if (fromSlot) {
+                fromSlot.courses = fromSlot.courses.filter(c => c !== courseCode);
+            }
+            if (!targetSlot.courses.includes(courseCode)) {
+                targetSlot.courses.push(courseCode);
+            }
+
+            const toHeadcount = getDraftSlotHeadcount(targetSlot);
+            const moveRecord = {
+                course_code: courseCode,
+                course_name: DB?.courses[courseCode]?.name || courseCode,
+                enrolled: DB?.courses[courseCode]?.enrolled_count || 0,
+                from_slot_id: fromSlot ? fromSlot.id : "unscheduled",
+                from_slot_name: fromSlot ? fromSlot.full_name : "Unscheduled",
+                to_slot_id: targetSlot.id,
+                to_slot_name: targetSlot.full_name,
+                to_headcount: toHeadcount,
+                timestamp: new Date().toLocaleTimeString()
+            };
+
+            const existingIdx = draftMoves.findIndex(m => m.course_code === courseCode);
+            if (existingIdx !== -1) {
+                moveRecord.from_slot_name = draftMoves[existingIdx].from_slot_name;
+                draftMoves[existingIdx] = moveRecord;
+            } else {
+                draftMoves.push(moveRecord);
+            }
+
+            recalculateDraftAudit();
+            renderDraftUI();
+            populateDraftDropdowns();
+
+            showToast(`✓ Reassigned ${courseCode} to ${targetSlot.date} ${targetSlot.session}!`, "success");
+
+            if (options.switchTab) {
+                switchTab('draft');
+            }
+        }
+
+        function revertCourseMove(courseCode) {
+            let origSlot = null;
+            for (const s of timetableSlots) {
+                if (s.courses.includes(courseCode)) {
+                    origSlot = s;
+                    break;
+                }
+            }
+
+            draftHistory.push({
+                draftSlots: draftSlots.map(s => ({ ...s, courses: [...s.courses] })),
+                draftMoves: [...draftMoves]
+            });
+
+            for (const s of draftSlots) {
+                s.courses = s.courses.filter(c => c !== courseCode);
+            }
+
+            if (origSlot) {
+                const targetDraftSlot = draftSlots.find(s => s.id === origSlot.id);
+                if (targetDraftSlot && !targetDraftSlot.courses.includes(courseCode)) {
+                    targetDraftSlot.courses.push(courseCode);
+                }
+            }
+
+            draftMoves = draftMoves.filter(m => m.course_code !== courseCode);
+            recalculateDraftAudit();
+            renderDraftUI();
+            populateDraftDropdowns();
+            showToast(`Reverted ${courseCode} to original timetable slot`, "info");
+        }
+
+        function undoLastDraftMove() {
+            if (draftHistory.length === 0) {
+                showToast("No moves to undo", "warning");
+                return;
+            }
+            const prevState = draftHistory.pop();
+            draftSlots = prevState.draftSlots;
+            draftMoves = prevState.draftMoves;
+            recalculateDraftAudit();
+            renderDraftUI();
+            populateDraftDropdowns();
+            showToast("Undid last change", "info");
+        }
+
+        function resetDraftTimetable() {
+            if (draftMoves.length === 0) {
+                showToast("Draft is already identical to original timetable", "info");
+                return;
+            }
+            if (!confirm("Are you sure you want to reset all draft changes back to the original timetable?")) return;
+            initDraftEngine();
+            showToast("Draft timetable reset to original", "info");
+        }
+
+        function renderDraftUI() {
+            const movedCount = draftMoves.length;
+            const clashCount = draftClashes.length;
+
+            const navBadge = document.getElementById('navDraftBadge');
+            if (navBadge) {
+                navBadge.style.display = movedCount > 0 ? 'inline-block' : 'none';
+                navBadge.textContent = `${movedCount} Move${movedCount === 1 ? '' : 's'}`;
+            }
+
+            const statusBadge = document.getElementById('draftStatusBadge');
+            if (statusBadge) {
+                if (movedCount === 0) {
+                    statusBadge.textContent = '0 Courses Moved (Clean Draft)';
+                    statusBadge.style.background = 'rgba(16, 185, 129, 0.15)';
+                    statusBadge.style.color = '#34d399';
+                } else {
+                    statusBadge.textContent = `${movedCount} Course${movedCount === 1 ? '' : 's'} Reassigned in Draft`;
+                    statusBadge.style.background = 'rgba(99, 102, 241, 0.2)';
+                    statusBadge.style.color = '#a5b4fc';
+                }
+            }
+
+            const clashDisplay = document.getElementById('draftClashCountDisplay');
+            if (clashDisplay) {
+                if (clashCount === 0) {
+                    clashDisplay.innerHTML = `<span style="color: #34d399;">✓ 0 Clashes</span>`;
+                } else {
+                    clashDisplay.innerHTML = `<span style="color: #fb7185;">⚠️ ${clashCount} Clash${clashCount === 1 ? '' : 'es'}</span>`;
+                }
+            }
+
+            const movedDisplay = document.getElementById('draftMovedCountDisplay');
+            if (movedDisplay) movedDisplay.textContent = movedCount;
+
+            const slotsDisplay = document.getElementById('draftSlotsCountDisplay');
+            if (slotsDisplay) slotsDisplay.textContent = draftSlots.length;
+
+            const clBadge = document.getElementById('draftChangelogBadge');
+            if (clBadge) clBadge.textContent = `${movedCount} move${movedCount === 1 ? '' : 's'}`;
+
+            const clBody = document.getElementById('draftChangelogBody');
+            if (clBody) {
+                clBody.innerHTML = '';
+                if (draftMoves.length === 0) {
+                    clBody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 1.25rem;">Original schedule active. Pick any course above or click "Move to Draft" in the Course Inspector.</td></tr>';
+                } else {
+                    draftMoves.forEach(m => {
+                        const tr = document.createElement('tr');
+                        const isClashing = draftClashes.some(cl => cl.slot_id === m.to_slot_id && (cl.course_a === m.course_code || cl.course_b === m.course_code));
+                        tr.innerHTML = `
+                            <td><span class="code-pill moved" onclick="inspectCourse('${m.course_code}')">★ ${m.course_code}</span></td>
+                            <td>${m.course_name}</td>
+                            <td><strong style="color: var(--accent-cyan);">${m.enrolled || '-'}</strong> stds</td>
+                            <td style="color: var(--text-secondary); font-size: 0.8rem;">${m.from_slot_name}</td>
+                            <td><strong style="color: #6ee7b7; font-size: 0.85rem;">${m.to_slot_name}</strong></td>
+                            <td><strong style="color: #67e8f9;">${m.to_headcount}</strong> students</td>
+                            <td>
+                                <span class="stat-badge ${isClashing ? 'badge-danger' : ''}" style="${isClashing ? '' : 'background: rgba(16,185,129,0.2); color: #34d399;'}">
+                                    ${isClashing ? '⚠️ Clash in Draft' : '✓ Conflict Free'}
+                                </span>
+                            </td>
+                            <td>
+                                <button class="btn btn-secondary" style="padding: 0.25rem 0.55rem; font-size: 0.75rem; border-color: rgba(244,63,94,0.4); color: #fda4af;" onclick="revertCourseMove('${m.course_code}')">
+                                    Revert
+                                </button>
+                            </td>
+                        `;
+                        clBody.appendChild(tr);
+                    });
+                }
+            }
+
+            const grid = document.getElementById('draftTimetableGrid');
+            if (grid) {
+                grid.innerHTML = '';
+                const movedSet = new Set(draftMoves.map(m => m.course_code));
+
+                draftSlots.forEach(slot => {
+                    const card = document.createElement('div');
+                    const slotClashes = draftClashes.filter(cl => cl.slot_id === slot.id || (cl.date === slot.date && cl.slot === slot.slot_name));
+                    const hasClash = slotClashes.length > 0;
+                    const hasMoved = slot.courses.some(c => movedSet.has(c));
+
+                    card.className = `slot-card ${hasClash ? 'has-clash' : ''} ${hasMoved ? 'has-moved' : ''}`;
+                    const sessionBadgeClass = slot.session.toLowerCase() === 'morning' ? 'badge-morning' : 'badge-evening';
+
+                    const clashingCodes = new Set();
+                    slotClashes.forEach(cl => { clashingCodes.add(cl.course_a); clashingCodes.add(cl.course_b); });
+
+                    const headcount = getDraftSlotHeadcount(slot);
+                    const origHeadcount = getOriginalSlotHeadcountByDateSession(slot.date, slot.session);
+                    const diff = headcount - origHeadcount;
+                    const diffText = diff === 0 ? '' : (diff > 0 ? ` (+${diff})` : ` (${diff})`);
+
+                    const tagCloud = slot.courses.map(c => {
+                        const isMoved = movedSet.has(c);
+                        const isClashing = clashingCodes.has(c);
+                        let cls = "code-pill";
+                        if (isClashing) cls += " clash";
+                        else if (isMoved) cls += " moved";
+                        return `<span class="${cls}" onclick="inspectCourse('${c}')" title="${isMoved ? 'Reassigned Course' : ''}">${isMoved ? '★ ' : ''}${c}</span>`;
+                    }).join(' ');
+
+                    card.innerHTML = `
+                        <div class="slot-header">
+                            <div>
+                                <div class="slot-title">${slot.date}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">${slot.slot_name.includes('(') ? slot.slot_name.split('(')[1].replace(')', '') : slot.session}</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <span class="slot-badge ${sessionBadgeClass}">${slot.session}</span>
+                                <div style="font-size: 0.75rem; color: #67e8f9; font-weight: 700; margin-top: 0.25rem;">
+                                    👥 ${headcount.toLocaleString()} stds <span style="font-size:0.7rem; color:${diff > 0 ? '#6ee7b7' : '#fda4af'}">${diffText}</span>
+                                </div>
+                            </div>
+                        </div>
+                        ${hasClash ? `<div style="color: #fb7185; font-size: 0.75rem; font-weight: 700; margin-bottom: 0.5rem;">⚠️ DIRECT CLASH IN DRAFT</div>` : ''}
+                        ${hasMoved && !hasClash ? `<div style="color: #6ee7b7; font-size: 0.72rem; font-weight: 600; margin-bottom: 0.4rem;">★ Includes Reassigned Course</div>` : ''}
+                        <div class="course-tag-cloud">${tagCloud}</div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+        }
+
+        async function exportDraftExcel() {
+            const btn = document.getElementById('btnExportDraft');
+            const origHtml = btn ? btn.innerHTML : '';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '⏳ Generating Color-Coded Excel...';
+            }
+
+            try {
+                const payload = {
+                    draft_slots: draftSlots,
+                    moves: draftMoves
+                };
+
+                const res = await fetch('/api/export-draft', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    const blob = await res.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = `Draft_Exam_Timetable_${new Date().toISOString().slice(0, 10)}.xlsx`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    showToast("✓ Color-coded Excel draft exported successfully!", "success");
+                } else {
+                    throw new Error("Server export returned status " + res.status);
+                }
+            } catch (err) {
+                console.warn("Backend export error, falling back to CSV export:", err);
+                fallbackCsvExport();
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = origHtml;
+                }
+            }
+        }
+
+        function fallbackCsvExport() {
+            let csv = "Exam Date,Session,Slot Timing,Slot Student Headcount,Net Diff vs Original,Courses Count,Scheduled Courses,Clash Status\n";
+            draftSlots.forEach(s => {
+                const hc = getDraftSlotHeadcount(s);
+                const origHc = getOriginalSlotHeadcountByDateSession(s.date, s.session);
+                const diff = hc - origHc;
+                const timing = s.session === "Morning" ? "10:30 am - 12:30 pm" : "3:30 pm - 5:30 pm";
+                const coursesStr = `"${s.courses.join(', ')}"`;
+                const clashes = draftClashes.filter(cl => cl.slot_id === s.id);
+                const clashStr = clashes.length > 0 ? `Clash (${clashes.length})` : "Conflict Free";
+                csv += `${s.date},${s.session},${timing},${hc},${diff >= 0 ? '+' + diff : diff},${s.courses.length},${coursesStr},${clashStr}\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Draft_Timetable_${new Date().toISOString().slice(0, 10)}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showToast("Exported draft CSV", "info");
+        }
+
+        function showToast(msg, type = "info") {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            const colors = {
+                success: '#10b981',
+                warning: '#f59e0b',
+                error: '#f43f5e',
+                info: '#6366f1'
+            };
+            const icons = {
+                success: '✓',
+                warning: '⚠️',
+                error: '❌',
+                info: 'ℹ️'
+            };
+            toast.style.borderColor = colors[type] || colors.info;
+            toast.innerHTML = `<span style="font-weight: 800; color: ${colors[type] || colors.info};">${icons[type] || '•'}</span> <span>${msg}</span>`;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
         }
 
         window.addEventListener('DOMContentLoaded', init);

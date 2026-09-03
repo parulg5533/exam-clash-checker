@@ -25,13 +25,51 @@ CHECKER = ExamClashChecker()
 class handler(BaseHTTPRequestHandler):
     def end_headers(self):
         self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, OPTIONS")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         super().end_headers()
 
     def do_OPTIONS(self):
         self.send_response(200)
         self.end_headers()
+
+    def do_POST(self):
+        parsed = urllib.parse.urlparse(self.path)
+        query = urllib.parse.parse_qs(parsed.query)
+        raw_path = query.get("path", [""])[0]
+        if raw_path:
+            if not raw_path.startswith("/api/"):
+                path = "/api/" + raw_path.lstrip("/")
+            else:
+                path = raw_path
+        else:
+            path = parsed.path
+
+        if path in ("/api/export-draft", "api/export-draft"):
+            try:
+                content_length = int(self.headers.get("Content-Length", 0))
+                body = self.rfile.read(content_length) if content_length > 0 else b"{}"
+                payload = json.loads(body.decode("utf-8")) if body else {}
+                draft_slots = payload.get("draft_slots", [])
+                moves_log = payload.get("moves", [])
+
+                buffer = io.BytesIO()
+                CHECKER.export_draft_to_excel(draft_slots, moves_log, buffer)
+                buffer.seek(0)
+                excel_bytes = buffer.read()
+
+                self.send_response(200)
+                self.send_header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                self.send_header("Content-Disposition", "attachment; filename=Draft_Exam_Timetable_Report.xlsx")
+                self.send_header("Content-Length", str(len(excel_bytes)))
+                self.end_headers()
+                self.wfile.write(excel_bytes)
+                return
+            except Exception as e:
+                self.send_json({"error": f"Failed to export draft: {str(e)}"}, status=500)
+                return
+
+        self.send_json({"error": "Endpoint not found", "path": path}, status=404)
 
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)

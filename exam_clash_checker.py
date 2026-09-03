@@ -617,3 +617,305 @@ class ExamClashChecker:
                 pd.DataFrame(sd_rows).to_excel(writer, sheet_name="Same-Day Fatigue", index=False)
 
         return output_filepath
+
+    def export_draft_to_excel(self, draft_slots: list, moves_log: list, output_filepath_or_buffer="Draft_Exam_Timetable.xlsx"):
+        """
+        Exports an interactive draft timetable to a fully styled, color-coded Excel workbook.
+        Highlights moved courses, slot headcounts, changelog, and draft clash audit.
+        """
+        from openpyxl import Workbook
+        from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+        from openpyxl.utils import get_column_letter
+
+        wb = Workbook()
+        # Default sheet
+        ws_main = wb.active
+        ws_main.title = "Draft Timetable"
+
+        # Styles
+        font_header = Font(name="Calibri", size=11, bold=True, color="FFFFFF")
+        fill_header_navy = PatternFill(start_color="1E293B", end_color="1E293B", fill_type="solid")
+        fill_header_green = PatternFill(start_color="065F46", end_color="065F46", fill_type="solid")
+        fill_header_indigo = PatternFill(start_color="312E81", end_color="312E81", fill_type="solid")
+        fill_header_rose = PatternFill(start_color="881337", end_color="881337", fill_type="solid")
+
+        fill_moved = PatternFill(start_color="D1FAE5", end_color="D1FAE5", fill_type="solid")  # soft mint green
+        fill_clash = PatternFill(start_color="FEE2E2", end_color="FEE2E2", fill_type="solid")  # soft red
+        fill_zebra = PatternFill(start_color="F8FAFC", end_color="F8FAFC", fill_type="solid")
+
+        font_bold = Font(name="Calibri", size=10, bold=True)
+        font_regular = Font(name="Calibri", size=10)
+        font_moved = Font(name="Calibri", size=10, bold=True, color="047857")
+        font_clash = Font(name="Calibri", size=10, bold=True, color="B91C1C")
+        font_success = Font(name="Calibri", size=10, bold=True, color="059669")
+
+        thin_border_side = Side(border_style="thin", color="CBD5E1")
+        thin_border = Border(left=thin_border_side, right=thin_border_side, top=thin_border_side, bottom=thin_border_side)
+        align_center = Alignment(horizontal="center", vertical="center", wrap_text=True)
+        align_left = Alignment(horizontal="left", vertical="center", wrap_text=True)
+
+        # Set of moved course codes
+        moved_courses = {m.get("course_code") for m in moves_log if m.get("course_code")}
+
+        # Original slot headcounts lookup: (date, session) -> headcount
+        orig_slot_headcounts = {}
+        for s in self.slots:
+            stus = set()
+            for c in s["courses"]:
+                stus.update(self.course_to_students.get(c, set()))
+            orig_slot_headcounts[(s["date"], s["session"])] = len(stus)
+
+        # -------------------------------------------------------------
+        # SHEET 1: Draft Timetable
+        # -------------------------------------------------------------
+        main_headers = [
+            "Exam Date", "Session", "Slot Timing", "Slot Student Headcount",
+            "Net Change vs Original", "Courses Count", "Scheduled Courses", "Clash Status"
+        ]
+        ws_main.append(main_headers)
+        for col_idx, h in enumerate(main_headers, 1):
+            cell = ws_main.cell(row=1, column=col_idx)
+            cell.fill = fill_header_navy
+            cell.font = font_header
+            cell.alignment = align_center
+            cell.border = thin_border
+        ws_main.row_dimensions[1].height = 28
+
+        draft_clashes = []
+        row_num = 2
+
+        for slot in draft_slots:
+            s_date = slot.get("date", "")
+            s_session = slot.get("session", "")
+            s_name = slot.get("slot_name", f"{s_session} Exam")
+            s_timing = "10:30 am - 12:30 pm" if s_session.lower() == "morning" else "3:30 pm - 5:30 pm"
+            courses = slot.get("courses", [])
+
+            # Compute unique student count in this slot
+            slot_students = set()
+            for c in courses:
+                slot_students.update(self.course_to_students.get(c, set()))
+            headcount = len(slot_students)
+
+            orig_count = orig_slot_headcounts.get((s_date, s_session), headcount)
+            diff = headcount - orig_count
+            diff_str = f"+{diff}" if diff > 0 else str(diff)
+
+            # Check clashes within this slot
+            slot_clash_list = []
+            for i in range(len(courses)):
+                c1 = courses[i]
+                for j in range(i + 1, len(courses)):
+                    c2 = courses[j]
+                    overlap = self.conflict_graph[c1].get(c2, set())
+                    if overlap:
+                        clash_info = {
+                            "date": s_date,
+                            "slot": s_name,
+                            "course_a": c1,
+                            "course_b": c2,
+                            "overlap_count": len(overlap),
+                            "students": sorted(list(overlap))
+                        }
+                        slot_clash_list.append(clash_info)
+                        draft_clashes.append(clash_info)
+
+            has_slot_clash = len(slot_clash_list) > 0
+            has_slot_moved = any(c in moved_courses for c in courses)
+
+            # Format course list with [MOVED] tag
+            course_display_parts = []
+            for c in courses:
+                if c in moved_courses:
+                    course_display_parts.append(f"{c}* (MOVED)")
+                else:
+                    course_display_parts.append(c)
+            courses_str = ", ".join(course_display_parts)
+
+            clash_str = f"❌ {len(slot_clash_list)} Clash ({sum(cl['overlap_count'] for cl in slot_clash_list)} stds)" if has_slot_clash else "✓ Conflict Free"
+
+            row_values = [
+                s_date, s_session, s_timing, headcount, diff_str, len(courses), courses_str, clash_str
+            ]
+            ws_main.append(row_values)
+            ws_main.row_dimensions[row_num].height = 24
+
+            for col_idx in range(1, len(row_values) + 1):
+                cell = ws_main.cell(row=row_num, column=col_idx)
+                cell.border = thin_border
+                cell.font = font_regular
+                cell.alignment = align_center if col_idx != 7 else align_left
+
+                # Color coding
+                if col_idx == 4:  # Headcount
+                    cell.font = font_bold
+                elif col_idx == 5 and diff != 0:  # Diff
+                    cell.font = font_moved if diff > 0 else font_bold
+                elif col_idx == 7 and has_slot_moved:  # Courses column has moved courses
+                    cell.fill = fill_moved
+                    cell.font = font_bold
+                elif col_idx == 8:  # Clash status
+                    if has_slot_clash:
+                        cell.fill = fill_clash
+                        cell.font = font_clash
+                    else:
+                        cell.font = font_success
+                elif row_num % 2 == 1:
+                    cell.fill = fill_zebra
+
+            row_num += 1
+
+        # -------------------------------------------------------------
+        # SHEET 2: Moved Courses Changelog
+        # -------------------------------------------------------------
+        ws_moves = wb.create_sheet(title="Moved Courses (Changelog)")
+        moves_headers = [
+            "Course Code", "Course Title", "Enrolled Students",
+            "Original Slot", "New Draft Slot", "Draft Slot Headcount", "Action Note"
+        ]
+        ws_moves.append(moves_headers)
+        for col_idx, h in enumerate(moves_headers, 1):
+            cell = ws_moves.cell(row=1, column=col_idx)
+            cell.fill = fill_header_green
+            cell.font = font_header
+            cell.alignment = align_center
+            cell.border = thin_border
+        ws_moves.row_dimensions[1].height = 28
+
+        if moves_log:
+            for m_idx, m in enumerate(moves_log, 2):
+                c_code = m.get("course_code", "")
+                c_name = self.course_info.get(c_code, CourseInfo(code=c_code, name=c_code)).name
+                enrolled = len(self.course_to_students.get(c_code, set()))
+                from_slot = m.get("from_slot_name", "Unscheduled")
+                to_slot = m.get("to_slot_name", "")
+                to_headcount = m.get("to_headcount", "")
+                note = m.get("note", "Course reassigned in draft")
+
+                row_vals = [c_code, c_name, enrolled, from_slot, to_slot, to_headcount, note]
+                ws_moves.append(row_vals)
+                ws_moves.row_dimensions[m_idx].height = 22
+
+                for col_idx in range(1, len(row_vals) + 1):
+                    cell = ws_moves.cell(row=m_idx, column=col_idx)
+                    cell.border = thin_border
+                    cell.font = font_regular
+                    cell.alignment = align_center if col_idx in [1, 3, 6] else align_left
+                    if col_idx == 1:
+                        cell.font = font_moved
+                        cell.fill = fill_moved
+                    elif col_idx == 5:
+                        cell.font = font_bold
+                    elif m_idx % 2 == 1:
+                        cell.fill = fill_zebra
+        else:
+            ws_moves.append(["No courses moved in this draft", "-", "-", "-", "-", "-", "-"])
+            ws_moves.cell(row=2, column=1).font = font_regular
+
+        # -------------------------------------------------------------
+        # SHEET 3: Slot Headcounts & Capacity
+        # -------------------------------------------------------------
+        ws_cap = wb.create_sheet(title="Slot Headcounts & Capacity")
+        cap_headers = [
+            "Exam Date", "Session", "Original Headcount", "Draft Headcount",
+            "Net Load Diff", "Courses Count", "Moved Courses in Slot"
+        ]
+        ws_cap.append(cap_headers)
+        for col_idx, h in enumerate(cap_headers, 1):
+            cell = ws_cap.cell(row=1, column=col_idx)
+            cell.fill = fill_header_indigo
+            cell.font = font_header
+            cell.alignment = align_center
+            cell.border = thin_border
+        ws_cap.row_dimensions[1].height = 28
+
+        for c_idx, slot in enumerate(draft_slots, 2):
+            s_date = slot.get("date", "")
+            s_session = slot.get("session", "")
+            courses = slot.get("courses", [])
+
+            slot_students = set()
+            for c in courses:
+                slot_students.update(self.course_to_students.get(c, set()))
+            headcount = len(slot_students)
+            orig_count = orig_slot_headcounts.get((s_date, s_session), headcount)
+            diff = headcount - orig_count
+            diff_str = f"+{diff}" if diff > 0 else str(diff)
+
+            moved_in_slot = [c for c in courses if c in moved_courses]
+            moved_str = ", ".join(moved_in_slot) if moved_in_slot else "-"
+
+            row_vals = [s_date, s_session, orig_count, headcount, diff_str, len(courses), moved_str]
+            ws_cap.append(row_vals)
+            ws_cap.row_dimensions[c_idx].height = 22
+
+            for col_idx in range(1, len(row_vals) + 1):
+                cell = ws_cap.cell(row=c_idx, column=col_idx)
+                cell.border = thin_border
+                cell.font = font_regular
+                cell.alignment = align_center if col_idx != 7 else align_left
+                if col_idx == 4:
+                    cell.font = font_bold
+                elif col_idx == 7 and moved_in_slot:
+                    cell.fill = fill_moved
+                    cell.font = font_moved
+                elif c_idx % 2 == 1:
+                    cell.fill = fill_zebra
+
+        # -------------------------------------------------------------
+        # SHEET 4: Draft Clash Audit
+        # -------------------------------------------------------------
+        ws_clash = wb.create_sheet(title="Draft Clash Audit")
+        clash_headers = [
+            "Exam Date", "Slot Name", "Course A", "Course A Title",
+            "Course B", "Course B Title", "Overlap Count", "Affected Students"
+        ]
+        ws_clash.append(clash_headers)
+        for col_idx, h in enumerate(clash_headers, 1):
+            cell = ws_clash.cell(row=1, column=col_idx)
+            cell.fill = fill_header_rose
+            cell.font = font_header
+            cell.alignment = align_center
+            cell.border = thin_border
+        ws_clash.row_dimensions[1].height = 28
+
+        if draft_clashes:
+            for cl_idx, cl in enumerate(draft_clashes, 2):
+                c1 = cl["course_a"]
+                c2 = cl["course_b"]
+                c1_name = self.course_info.get(c1, CourseInfo(code=c1, name=c1)).name
+                c2_name = self.course_info.get(c2, CourseInfo(code=c2, name=c2)).name
+                stus_str = ", ".join(cl["students"][:20]) + ("..." if len(cl["students"]) > 20 else "")
+
+                row_vals = [cl["date"], cl["slot"], c1, c1_name, c2, c2_name, cl["overlap_count"], stus_str]
+                ws_clash.append(row_vals)
+                ws_clash.row_dimensions[cl_idx].height = 22
+
+                for col_idx in range(1, len(row_vals) + 1):
+                    cell = ws_clash.cell(row=cl_idx, column=col_idx)
+                    cell.border = thin_border
+                    cell.font = font_regular
+                    cell.alignment = align_center if col_idx in [1, 3, 5, 7] else align_left
+                    if col_idx in [3, 5]:
+                        cell.fill = fill_clash
+                        cell.font = font_clash
+        else:
+            ws_clash.append(["🎉 Zero Clashes!", "All slots are conflict-free in this draft timetable!", "-", "-", "-", "-", "0", "-"])
+            ws_clash.row_dimensions[2].height = 26
+            for col_idx in range(1, 9):
+                cell = ws_clash.cell(row=2, column=col_idx)
+                cell.fill = fill_moved
+                cell.font = font_success
+                cell.alignment = align_center
+                cell.border = thin_border
+
+        # Adjust column widths automatically
+        for sheet in [ws_main, ws_moves, ws_cap, ws_clash]:
+            for col in sheet.columns:
+                max_len = max(len(str(cell.value or '')) for cell in col)
+                col_letter = get_column_letter(col[0].column)
+                sheet.column_dimensions[col_letter].width = min(max(max_len + 3, 12), 48)
+
+        # Save to filepath or BytesIO buffer
+        wb.save(output_filepath_or_buffer)
+        return output_filepath_or_buffer
