@@ -349,6 +349,40 @@ class ExamClashChecker:
                 })
                 all_affected_students.update(overlap)
 
+        # Target slot headcount before & after
+        target_before_stus = set()
+        for c in target_slot["courses"]:
+            target_before_stus.update(self.course_to_students.get(c, set()))
+        target_before = len(target_before_stus)
+
+        target_after_stus = set(target_before_stus)
+        target_after_stus.update(self.course_to_students.get(course_code, set()))
+        target_after = len(target_after_stus)
+
+        # Source slot headcount before & after (if course is currently scheduled)
+        source_impact = None
+        current_slots = self.course_to_slots.get(course_code, [])
+        if current_slots and current_slots[0]["id"] != target_slot["id"]:
+            src_slot = current_slots[0]
+            src_before_stus = set()
+            for c in src_slot["courses"]:
+                src_before_stus.update(self.course_to_students.get(c, set()))
+            src_before = len(src_before_stus)
+
+            src_after_stus = set()
+            for c in src_slot["courses"]:
+                if c != course_code:
+                    src_after_stus.update(self.course_to_students.get(c, set()))
+            src_after = len(src_after_stus)
+
+            source_impact = {
+                "slot_id": src_slot["id"],
+                "slot_name": src_slot["full_name"],
+                "before": src_before,
+                "after": src_after,
+                "diff": src_after - src_before,
+            }
+
         return {
             "course_code": course_code,
             "slot_id": target_slot["id"],
@@ -357,10 +391,16 @@ class ExamClashChecker:
             "clashes": slot_clashes,
             "total_affected_students": len(all_affected_students),
             "affected_students": sorted(list(all_affected_students)),
+            "headcount": {
+                "target_before": target_before,
+                "target_after": target_after,
+                "target_diff": target_after - target_before,
+                "source": source_impact,
+            },
         }
 
     def find_safe_slots(self, course_code: str) -> dict:
-        """Finds all conflict-free slots in the timetable for a given course."""
+        """Finds all conflict-free slots in the timetable for a given course with headcount changes."""
         course_code = course_code.strip()
         safe_slots = []
         clashing_slots = []
@@ -373,6 +413,9 @@ class ExamClashChecker:
                 "session": slot["session"],
                 "full_name": slot["full_name"],
                 "current_course_count": len(slot["courses"]),
+                "headcount_before": res["headcount"]["target_before"],
+                "headcount_after": res["headcount"]["target_after"],
+                "headcount_diff": res["headcount"]["target_diff"],
             }
             if not res["has_clash"]:
                 safe_slots.append(slot_data)

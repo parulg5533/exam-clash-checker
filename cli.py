@@ -187,7 +187,8 @@ def handle_safe_slots(checker: ExamClashChecker, course_code: str):
         table.add_column("Slot ID", style="cyan")
         table.add_column("Date", style="white")
         table.add_column("Session", style="bold yellow")
-        table.add_column("Other Courses in Slot", style="magenta")
+        table.add_column("Current Headcount", style="yellow")
+        table.add_column("After Adding", style="bold cyan")
 
         for idx, s in enumerate(res["safe_slots"], start=1):
             table.add_row(
@@ -195,13 +196,68 @@ def handle_safe_slots(checker: ExamClashChecker, course_code: str):
                 s["slot_id"],
                 s["date"],
                 s["session"],
-                f"{s['current_course_count']} courses scheduled"
+                f"{s['headcount_before']:,} students",
+                f"{s['headcount_after']:,} students (+{s['headcount_diff']})"
             )
         console.print(table)
     else:
         print(f"Safe slots count: {res['safe_slots_count']}")
         for s in res["safe_slots"]:
-            print(f"  [SAFE] {s['full_name']}")
+            print(f"  [SAFE] {s['full_name']} - Headcount: {s['headcount_before']} -> {s['headcount_after']} (+{s['headcount_diff']})")
+
+
+def handle_test_slot(checker: ExamClashChecker, course_code: str, slot_id: str):
+    course_code = course_code.strip().upper()
+    res = checker.check_course_in_slot(course_code, slot_id)
+    if "error" in res:
+        print(res["error"])
+        return
+
+    hc = res["headcount"]
+    if USE_RICH:
+        status_text = "[bold green]✓ 100% Conflict-Free Slot![/bold green]" if not res["has_clash"] else f"[bold red]❌ Clash Detected ({res['total_affected_students']} students affected)[/bold red]"
+        
+        console.print(Panel(
+            f"[bold white]Course:[/bold white] [bold cyan]{course_code}[/bold cyan]\n"
+            f"[bold white]Target Shift:[/bold white] {res['slot_name']}\n"
+            f"[bold white]Clash Status:[/bold white] {status_text}",
+            title=f"Shift Headcount Counter: {course_code}",
+            style="cyan"
+        ))
+
+        table = Table(title="Target Shift Headcount Impact", style="cyan")
+        table.add_column("Shift", style="white")
+        table.add_column("Before Move", style="yellow")
+        table.add_column("After Move", style="bold cyan")
+        table.add_column("Net Change", style="bold green")
+        table.add_row(
+            res["slot_name"],
+            f"{hc['target_before']:,} students",
+            f"{hc['target_after']:,} students",
+            f"+{hc['target_diff']:,} students"
+        )
+        console.print(table)
+
+        if hc["source"]:
+            src = hc["source"]
+            s_table = Table(title="Source Shift Relief (Current Slot)", style="yellow")
+            s_table.add_column("Source Shift", style="white")
+            s_table.add_column("Before Move", style="yellow")
+            s_table.add_column("After Move", style="bold green")
+            s_table.add_column("Net Relief", style="bold magenta")
+            s_table.add_row(
+                src["slot_name"],
+                f"{src['before']:,} students",
+                f"{src['after']:,} students",
+                f"{src['diff']:,} students"
+            )
+            console.print(s_table)
+    else:
+        print(f"Course: {course_code} -> {res['slot_name']}")
+        print(f"Target shift headcount: {hc['target_before']} -> {hc['target_after']} (+{hc['target_diff']})")
+        if hc["source"]:
+            src = hc["source"]
+            print(f"Source shift relief: {src['before']} -> {src['after']} ({src['diff']})")
 
 
 def handle_student(checker: ExamClashChecker, roll_no: str):
@@ -267,6 +323,11 @@ def main():
     p_safe = subparsers.add_parser("safe-slots", help="Find all conflict-free slots for a course")
     p_safe.add_argument("course_code", help="Course code (e.g. HS4118)")
 
+    # test-slot
+    p_test = subparsers.add_parser("test-slot", help="Test placing/moving a course into a slot and view headcount counter")
+    p_test.add_argument("course_code", help="Course code (e.g. HS4118)")
+    p_test.add_argument("slot_id", help="Slot ID or name (e.g. slot_1)")
+
     # student
     p_stu = subparsers.add_parser("student", help="View student's exam datesheet and clashes")
     p_stu.add_argument("roll_no", help="Student roll number (e.g. 2301MM04)")
@@ -286,6 +347,8 @@ def main():
         handle_check(checker, args.course_code)
     elif args.command == "safe-slots":
         handle_safe_slots(checker, args.course_code)
+    elif args.command == "test-slot":
+        handle_test_slot(checker, args.course_code, args.slot_id)
     elif args.command == "student":
         handle_student(checker, args.roll_no)
     elif args.command == "export":

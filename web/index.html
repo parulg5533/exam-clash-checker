@@ -916,13 +916,23 @@
             }
         }
 
+
+        function getSlotHeadcount(slot) {
+            if (!slot || !DB) return 0;
+            const stus = new Set();
+            (slot.courses || []).forEach(c => {
+                (DB.courses[c]?.students || []).forEach(st => stus.add(st));
+            });
+            return stus.size;
+        }
         function populateSimulatorSlots() {
             const select = document.getElementById('simulateSlotSelect');
             select.innerHTML = '<option value="">-- Choose Exam Slot to Test --</option>';
             timetableSlots.forEach(s => {
                 const opt = document.createElement('option');
                 opt.value = s.id;
-                opt.textContent = `${s.date} ${s.session} (${s.courses.length} courses)`;
+                const headcount = getSlotHeadcount(s);
+                opt.textContent = `${s.date} ${s.session} (${s.courses.length} courses • ${headcount.toLocaleString()} students)`;
                 select.appendChild(opt);
             });
         }
@@ -1036,7 +1046,7 @@
             } else {
                 safeSlots.forEach(s => {
                     const item = document.createElement('div');
-                    item.style.padding = '0.6rem 0.85rem';
+                    item.style.padding = '0.65rem 0.85rem';
                     item.style.borderRadius = '8px';
                     item.style.background = 'rgba(16, 185, 129, 0.08)';
                     item.style.border = '1px solid rgba(16, 185, 129, 0.25)';
@@ -1044,10 +1054,20 @@
                     item.style.justifyContent = 'space-between';
                     item.style.alignItems = 'center';
                     item.style.fontSize = '0.83rem';
+                    
+                    const beforeCount = getSlotHeadcount(s);
+                    const afterSet = new Set();
+                    s.courses.forEach(c => (DB.courses[c]?.students || []).forEach(st => afterSet.add(st)));
+                    (DB.courses[courseCode]?.students || []).forEach(st => afterSet.add(st));
+                    const afterCount = afterSet.size;
+                    const diff = afterCount - beforeCount;
+
                     item.innerHTML = `
                         <div>
                             <strong style="color: #6ee7b7;">${s.date} ${s.session}</strong>
-                            <div style="color: var(--text-muted); font-size: 0.75rem;">${s.courses.length} other courses</div>
+                            <div style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.15rem;">
+                                ${s.courses.length} courses &bull; Headcount: <strong>${beforeCount.toLocaleString()}</strong> &rarr; <strong style="color:#67e8f9">${afterCount.toLocaleString()}</strong> (+${diff})
+                            </div>
                         </div>
                         <span class="stat-badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">Conflict Free</span>
                     `;
@@ -1070,9 +1090,97 @@
                 return;
             }
 
+            const targetSlot = timetableSlots.find(s => s.id === slotId);
             const res = checkCourseInSlot(courseCode, slotId);
+
+            // --- 1. Target Shift Headcount Counter (Before vs After) ---
+            const targetBefore = getSlotHeadcount(targetSlot);
+            const targetAfterSet = new Set();
+            targetSlot.courses.forEach(c => (DB.courses[c]?.students || []).forEach(st => targetAfterSet.add(st)));
+            (DB.courses[courseCode]?.students || []).forEach(st => targetAfterSet.add(st));
+            const targetAfter = targetAfterSet.size;
+            const targetDiff = targetAfter - targetBefore;
+
+            // --- 2. Source Shift Headcount Counter (Before vs After relief) ---
+            const currentSlots = courseToSlots[courseCode] || [];
+            let sourceStatsHtml = '';
+            if (currentSlots.length > 0 && currentSlots[0].id !== slotId) {
+                const srcSlot = currentSlots[0];
+                const srcBefore = getSlotHeadcount(srcSlot);
+                const srcAfterSet = new Set();
+                srcSlot.courses.forEach(c => {
+                    if (c !== courseCode) {
+                        (DB.courses[c]?.students || []).forEach(st => srcAfterSet.add(st));
+                    }
+                });
+                const srcAfter = srcAfterSet.size;
+                const srcDiff = srcAfter - srcBefore; // negative relief
+
+                sourceStatsHtml = `
+                    <div style="background: rgba(17, 24, 39, 0.7); border: 1px solid var(--border-color); border-radius: 10px; padding: 0.85rem; margin-top: 0.65rem;">
+                        <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--accent-amber); font-weight: 700; margin-bottom: 0.45rem; display: flex; justify-content: space-between; align-items: center;">
+                            <span>Source Shift: ${srcSlot.full_name} (Current Slot)</span>
+                            <span class="stat-badge" style="background: rgba(245, 158, 11, 0.15); color: #fcd34d;">Shift Relieved</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; text-align: center;">
+                            <div style="background: rgba(255,255,255,0.02); padding: 0.5rem; border-radius: 8px;">
+                                <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Before Move</div>
+                                <div style="font-size: 1.2rem; font-weight: 800; color: var(--text-primary); margin-top: 0.2rem;">${srcBefore.toLocaleString()}</div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.02); padding: 0.5rem; border-radius: 8px; border: 1px solid rgba(245, 158, 11, 0.25);">
+                                <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">After Move</div>
+                                <div style="font-size: 1.2rem; font-weight: 800; color: #fcd34d; margin-top: 0.2rem;">${srcAfter.toLocaleString()}</div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.02); padding: 0.5rem; border-radius: 8px;">
+                                <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Net Relief</div>
+                                <div style="font-size: 1.2rem; font-weight: 800; color: #fca5a5; margin-top: 0.2rem;">${srcDiff}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Headcount Counter Card
+            const counterHtml = `
+                <div style="margin-top: 0.85rem; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem;">
+                    <div style="font-size: 0.85rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: space-between;">
+                        <span style="display: flex; align-items: center; gap: 0.4rem;">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                            Shift Student Headcount Counter
+                        </span>
+                        <span class="stat-badge" style="background: rgba(99, 102, 241, 0.2); color: #a5b4fc;">Exam Hall Capacity</span>
+                    </div>
+
+                    <!-- Target Shift Stats -->
+                    <div style="background: rgba(17, 24, 39, 0.7); border: 1px solid var(--border-color); border-radius: 10px; padding: 0.85rem;">
+                        <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--accent-cyan); font-weight: 700; margin-bottom: 0.45rem; display: flex; justify-content: space-between; align-items: center;">
+                            <span>Target Shift: ${res.slot_name}</span>
+                            <span class="stat-badge" style="background: rgba(6, 182, 212, 0.15); color: #67e8f9;">Shift Added</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; text-align: center;">
+                            <div style="background: rgba(255,255,255,0.02); padding: 0.5rem; border-radius: 8px;">
+                                <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Before Move</div>
+                                <div style="font-size: 1.2rem; font-weight: 800; color: var(--text-primary); margin-top: 0.2rem;">${targetBefore.toLocaleString()}</div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.02); padding: 0.5rem; border-radius: 8px; border: 1px solid rgba(6, 182, 212, 0.25);">
+                                <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">After Move</div>
+                                <div style="font-size: 1.2rem; font-weight: 800; color: #67e8f9; margin-top: 0.2rem;">${targetAfter.toLocaleString()}</div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.02); padding: 0.5rem; border-radius: 8px;">
+                                <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Net Load</div>
+                                <div style="font-size: 1.2rem; font-weight: 800; color: var(--accent-emerald); margin-top: 0.2rem;">+${targetDiff.toLocaleString()}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    ${sourceStatsHtml}
+                </div>
+            `;
+
+            // Clash / Safe Status Card
+            let statusHtml = '';
             if (!res.has_clash) {
-                resArea.innerHTML = `
+                statusHtml = `
                     <div class="clash-box success">
                         <h5 style="color: #10b981; font-weight: 700;">✓ 100% Conflict-Free Slot!</h5>
                         <p style="font-size: 0.82rem; color: #a7f3d0; margin-top: 0.25rem;">
@@ -1088,7 +1196,7 @@
                     </li>
                 `).join('');
 
-                resArea.innerHTML = `
+                statusHtml = `
                     <div class="clash-box danger">
                         <h5 style="color: #f43f5e; font-weight: 700;">❌ Hard Clash Detected (${res.total_affected} students affected)</h5>
                         <p style="font-size: 0.82rem; color: #fecdd3; margin-top: 0.25rem;">
@@ -1100,6 +1208,8 @@
                     </div>
                 `;
             }
+
+            resArea.innerHTML = statusHtml + counterHtml;
         }
 
         function inspectCourse(code) {
@@ -1131,13 +1241,17 @@
                     return `<span class="code-pill ${isClashing ? 'clash' : ''}" onclick="inspectCourse('${c}')">${c}</span>`;
                 }).join(' ');
 
+                const headcount = getSlotHeadcount(slot);
                 card.innerHTML = `
                     <div class="slot-header">
                         <div>
                             <div class="slot-title">${slot.date}</div>
                             <div style="font-size: 0.75rem; color: var(--text-muted);">${slot.slot_name.split('(')[1].replace(')', '')}</div>
                         </div>
-                        <span class="slot-badge ${sessionBadgeClass}">${slot.session}</span>
+                        <div style="text-align: right;">
+                            <span class="slot-badge ${sessionBadgeClass}">${slot.session}</span>
+                            <div style="font-size: 0.72rem; color: #a5b4fc; font-weight: 600; margin-top: 0.25rem;">👥 ${headcount.toLocaleString()} sitting</div>
+                        </div>
                     </div>
                     ${hasClash ? `<div style="color: #fb7185; font-size: 0.75rem; font-weight: 700; margin-bottom: 0.5rem;">⚠️ DIRECT CLASH IN THIS SLOT</div>` : ''}
                     <div class="course-tag-cloud">${tagCloud}</div>
